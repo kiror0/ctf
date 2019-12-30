@@ -1,5 +1,4 @@
-baseURL = "http://zeroload.github.io/ctf/"
-publishDir = "ctf"
+baseURL = "http://kiror0.github.io/ctf/"
 languageCode = "en-us"
 title = "Catousify"
 canonifyurls = true
