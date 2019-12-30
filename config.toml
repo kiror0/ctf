@@ -1,0 +1,22 @@
+baseURL = "http://zeroload.github.io/"
+publishDir = "ctf"
+languageCode = "en-us"
+title = "Catousify"
+canonifyurls = true
+theme = "kiera"
+copyright = "Copyright &copy; 2019 - kiror0"
+
+paginate = 10
+
+summaryLength = 30
+enableEmoji = true
+pygmentsCodeFences = true
+
+googleAnalytics = "UA-146594173-1" #Google Analytics ID
+
+[author]
+    name = "kiror0"
+    github = "kiror0"
+
+[params]
+    tagline = "No Clever Tagline Needed."
