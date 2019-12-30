@@ -2,29 +2,29 @@
    <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
      <channel>
        <title>pwn on Catousify</title>
-       <link>http://zeroload.github.io/ctf/categories/pwn/</link>
+       <link>http://kiror0.github.io/ctf/categories/pwn/</link>
        <description>Recent content in pwn on Catousify</description>
        <generator>Hugo -- gohugo.io</generator>
        <language>en-us</language>
        <copyright>Copyright &amp;copy; 2019 - kiror0</copyright>
        <lastBuildDate>Tue, 14 May 2019 00:53:00 +0000</lastBuildDate>
        
-           <atom:link href="http://zeroload.github.io/ctf/categories/pwn/index.xml" rel="self" type="application/rss+xml" />
+           <atom:link href="http://kiror0.github.io/ctf/categories/pwn/index.xml" rel="self" type="application/rss+xml" />
        
        
        <item>
          <title>DEF CON Quals 2019 - Speedrun 12</title>
-         <link>http://zeroload.github.io/ctf/posts/def-con-quals-2019-speedrun-12/</link>
+         <link>http://kiror0.github.io/ctf/posts/def-con-quals-2019-speedrun-12/</link>
          <pubDate>Tue, 14 May 2019 00:53:00 +0000</pubDate>
          
-         <guid>http://zeroload.github.io/ctf/posts/def-con-quals-2019-speedrun-12/</guid>
+         <guid>http://kiror0.github.io/ctf/posts/def-con-quals-2019-speedrun-12/</guid>
          <description>&lt;h2 id=&#34;desc&#34;&gt;desc&lt;/h2&gt;
 &lt;p&gt;&lt;a href=&#34;https://gist.github.com/adamdoupe/9fb1fed69421e789a0a623af912e456a&#34;&gt;https://gist.github.com/adamdoupe/9fb1fed69421e789a0a623af912e456a&lt;/a&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Downloads :
-&lt;a href=&#34;http://zeroload.github.io/ctf/ctf/assets/defcon/speedrun-012/speedrun-012&#34;&gt;speedrun-012&lt;/a&gt;
-&lt;a href=&#34;http://zeroload.github.io/ctf/ctf/assets/defcon/speedrun-012/solve.js&#34;&gt;solve.js&lt;/a&gt;
-&lt;a href=&#34;http://zeroload.github.io/ctf/ctf/assets/defcon/speedrun-012/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;http://kiror0.github.io/ctf/ctf/assets/defcon/speedrun-012/speedrun-012&#34;&gt;speedrun-012&lt;/a&gt;
+&lt;a href=&#34;http://kiror0.github.io/ctf/ctf/assets/defcon/speedrun-012/solve.js&#34;&gt;solve.js&lt;/a&gt;
+&lt;a href=&#34;http://kiror0.github.io/ctf/ctf/assets/defcon/speedrun-012/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;h2 id=&#34;intro&#34;&gt;intro&lt;/h2&gt;
 &lt;p&gt;This article is written by a first timer to experience &amp;ldquo;exploiting&amp;rdquo; &lt;del&gt;real&lt;/del&gt; JS engine. :p&lt;/p&gt;
@@ -191,16 +191,16 @@ OOO{Rule #3: Never `open` the package. Who knows what pwns are lying about?
        
        <item>
          <title>FireShell 2019 - quotes_list</title>
-         <link>http://zeroload.github.io/ctf/posts/fireshell-2019-quotes-list/</link>
+         <link>http://kiror0.github.io/ctf/posts/fireshell-2019-quotes-list/</link>
          <pubDate>Mon, 28 Jan 2019 06:54:42 +0000</pubDate>
          
-         <guid>http://zeroload.github.io/ctf/posts/fireshell-2019-quotes-list/</guid>
+         <guid>http://kiror0.github.io/ctf/posts/fireshell-2019-quotes-list/</guid>
          <description>&lt;h2 id=&#34;downloads&#34;&gt;downloads&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/fireshell/quotes_list/quotes_list.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/fireshell/quotes_list/libc.so.6&#34;&gt;libc.so.6&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/fireshell/quotes_list/ld-linux-x86-64.so.2&#34;&gt;ld-linux-x86-64.so.2&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/fireshell/quotes_list/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/quotes_list/quotes_list.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/quotes_list/libc.so.6&#34;&gt;libc.so.6&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/quotes_list/ld-linux-x86-64.so.2&#34;&gt;ld-linux-x86-64.so.2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/quotes_list/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;prep&#34;&gt;prep&lt;/h2&gt;
 &lt;p&gt;You&#39;ll need to patch elf binary to make it run correctly. Using &lt;code&gt;patchelf&lt;/code&gt;,&lt;/p&gt;
@@ -349,15 +349,15 @@ F#{th3r3_ar3_s0m3_n3ws_c0mm1ng_1nt0_libc-2.29}$
        
        <item>
          <title>FireShell 2019 - babyheap</title>
-         <link>http://zeroload.github.io/ctf/posts/fireshell-2019-babyheap/</link>
+         <link>http://kiror0.github.io/ctf/posts/fireshell-2019-babyheap/</link>
          <pubDate>Mon, 28 Jan 2019 06:54:34 +0000</pubDate>
          
-         <guid>http://zeroload.github.io/ctf/posts/fireshell-2019-babyheap/</guid>
+         <guid>http://kiror0.github.io/ctf/posts/fireshell-2019-babyheap/</guid>
          <description>&lt;h2 id=&#34;downloads&#34;&gt;downloads&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/fireshell/babyheap/babyheap.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/fireshell/babyheap/libc.so.6&#34;&gt;libc.so.6&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/fireshell/babyheap/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/babyheap/babyheap.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/babyheap/libc.so.6&#34;&gt;libc.so.6&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/babyheap/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;summary&#34;&gt;summary&lt;/h2&gt;
 &lt;ol&gt;
@@ -471,14 +471,14 @@ F#{W3lc0m3_t0_h34p_Expl01t4t10n!}$
        
        <item>
          <title>FireShell 2019 - casino</title>
-         <link>http://zeroload.github.io/ctf/posts/fireshell-2019-casino/</link>
+         <link>http://kiror0.github.io/ctf/posts/fireshell-2019-casino/</link>
          <pubDate>Mon, 28 Jan 2019 06:54:28 +0000</pubDate>
          
-         <guid>http://zeroload.github.io/ctf/posts/fireshell-2019-casino/</guid>
+         <guid>http://kiror0.github.io/ctf/posts/fireshell-2019-casino/</guid>
          <description>&lt;h2 id=&#34;download&#34;&gt;download&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/fireshell/casino/casino.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/fireshell/casino/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/casino/casino.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/casino/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;summary&#34;&gt;summary&lt;/h2&gt;
 &lt;ol&gt;
@@ -523,14 +523,14 @@ r&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;interactive()
        
        <item>
          <title>FireShell 2019 - leakless</title>
-         <link>http://zeroload.github.io/ctf/posts/fireshell-2019-leakless/</link>
+         <link>http://kiror0.github.io/ctf/posts/fireshell-2019-leakless/</link>
          <pubDate>Mon, 28 Jan 2019 06:54:21 +0000</pubDate>
          
-         <guid>http://zeroload.github.io/ctf/posts/fireshell-2019-leakless/</guid>
+         <guid>http://kiror0.github.io/ctf/posts/fireshell-2019-leakless/</guid>
          <description>&lt;h2 id=&#34;download&#34;&gt;download&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/fireshell/leakless/leakless&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/fireshell/leakless/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/leakless/leakless&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/leakless/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;summary&#34;&gt;summary&lt;/h2&gt;
 &lt;ol&gt;
@@ -599,19 +599,19 @@ I guess the intended solution should be using &lt;code&gt;ret2dlresolve&lt;/code
        
        <item>
          <title>Cyber Jawara 2018 Final - zeus</title>
-         <link>http://zeroload.github.io/ctf/posts/cyber-jawara-2018-final-zeus/</link>
+         <link>http://kiror0.github.io/ctf/posts/cyber-jawara-2018-final-zeus/</link>
          <pubDate>Sun, 14 Oct 2018 18:55:10 +0000</pubDate>
          
-         <guid>http://zeroload.github.io/ctf/posts/cyber-jawara-2018-final-zeus/</guid>
+         <guid>http://kiror0.github.io/ctf/posts/cyber-jawara-2018-final-zeus/</guid>
          <description>&lt;h2 id=&#34;desc&#34;&gt;desc&lt;/h2&gt;
 &lt;blockquote&gt;
 &lt;p&gt;In-memory key-value database server like Redis and Memcache is widely used for caching in a production server. Can you pwn this key-value database service? You need to reverse engineered it first to know what data structure is used for storing the data. This service is also run with sandbox. For patching, you are only allowed to patch 32 bytes in &amp;lsquo;zeus&amp;rsquo; binary and only 2 bytes in &amp;lsquo;zeus_sandbox&amp;rsquo;. For this service, all attack points are multiplied by 2x.&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Downloads :
-&lt;a href=&#34;http://zeroload.github.io/ctf/assets/cj/zeus/zeus&#34;&gt;zeus&lt;/a&gt;
-&lt;a href=&#34;http://zeroload.github.io/ctf/assets/cj/zeus/libc-2.28-9dc614ec33ee0284064ec5535bda431c.so&#34;&gt;libc-2.28-9dc614ec33ee0284064ec5535bda431c.so&lt;/a&gt;
-&lt;a href=&#34;http://zeroload.github.io/ctf/assets/cj/zeus/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;http://kiror0.github.io/ctf/assets/cj/zeus/zeus&#34;&gt;zeus&lt;/a&gt;
+&lt;a href=&#34;http://kiror0.github.io/ctf/assets/cj/zeus/libc-2.28-9dc614ec33ee0284064ec5535bda431c.so&#34;&gt;libc-2.28-9dc614ec33ee0284064ec5535bda431c.so&lt;/a&gt;
+&lt;a href=&#34;http://kiror0.github.io/ctf/assets/cj/zeus/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;pre&gt;&lt;code&gt;λ › ./zeus
 ...
@@ -988,14 +988,14 @@ $
        
        <item>
          <title>noxCTF 2018 - Grocery List</title>
-         <link>http://zeroload.github.io/ctf/posts/noxctf-2018-grocery-list/</link>
+         <link>http://kiror0.github.io/ctf/posts/noxctf-2018-grocery-list/</link>
          <pubDate>Sun, 09 Sep 2018 15:31:34 +0000</pubDate>
          
-         <guid>http://zeroload.github.io/ctf/posts/noxctf-2018-grocery-list/</guid>
+         <guid>http://kiror0.github.io/ctf/posts/noxctf-2018-grocery-list/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;Downloads:&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/noxCTF/grocery_list/GroceryList&#34;&gt;GroceryList&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/noxCTF/grocery_list/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/noxCTF/grocery_list/GroceryList&#34;&gt;GroceryList&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/noxCTF/grocery_list/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;h2 id=&#34;intro&#34;&gt;intro&lt;/h2&gt;
 &lt;pre&gt;&lt;code&gt;λ › checksec ./GroceryList
@@ -1310,15 +1310,15 @@ $
        
        <item>
          <title>HackToday 2018 - faile</title>
-         <link>http://zeroload.github.io/ctf/posts/hacktoday-2018-faile/</link>
+         <link>http://kiror0.github.io/ctf/posts/hacktoday-2018-faile/</link>
          <pubDate>Mon, 03 Sep 2018 22:16:58 +0000</pubDate>
          
-         <guid>http://zeroload.github.io/ctf/posts/hacktoday-2018-faile/</guid>
+         <guid>http://kiror0.github.io/ctf/posts/hacktoday-2018-faile/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;Downloads:&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/hacktoday/faile/faile&#34;&gt;faile&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/hacktoday/faile/libc.so&#34;&gt;libc.so&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://zeroload.github.io/ctf/assets/hacktoday/faile/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/faile/faile&#34;&gt;faile&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/faile/libc.so&#34;&gt;libc.so&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/faile/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;pre&gt;&lt;code&gt;$ ./faile
 ┏━┳━━┳┳┳━━━━━━━━━━━━━━━━┳━━┳┳┳┓
@@ -1566,10 +1566,10 @@ r&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;interactive()
        
        <item>
          <title>AgriHack 0x2 - Lift Rektorat Writeup</title>
-         <link>http://zeroload.github.io/ctf/posts/agrihack-0x2-lift-rektorat-writeup/</link>
+         <link>http://kiror0.github.io/ctf/posts/agrihack-0x2-lift-rektorat-writeup/</link>
          <pubDate>Fri, 24 Nov 2017 00:38:01 +0000</pubDate>
          
-         <guid>http://zeroload.github.io/ctf/posts/agrihack-0x2-lift-rektorat-writeup/</guid>
+         <guid>http://kiror0.github.io/ctf/posts/agrihack-0x2-lift-rektorat-writeup/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;&lt;em&gt;&lt;strong&gt;Lift Rektorat (300 pts)&lt;/strong&gt;&lt;/em&gt; Kamu sedang berada direktorat karena kamu hendak menemui rektor karena kamu ditunjuk menjadi kepala keamanan cyber di IPB. Tiba-tiba terjadi sebuah insiden yang membuat kamu tersadar, bahwa bahkan lift rektorat memiliki celah untuk dieksploitasi. Tunjukkan bagaimana kamu mengeksploitasi celah tersebut. &amp;ndash; binary &amp;ndash;&lt;/p&gt;
 &lt;/blockquote&gt;
