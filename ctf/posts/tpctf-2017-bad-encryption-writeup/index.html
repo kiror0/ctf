@@ -1,0 +1,223 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Catousify</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The HTML5 Herald" />
+  <meta name="author" content="kiror0" /><meta name="generator" content="Hugo 0.62.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
+  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="http://zeroload.github.io/">Catousify</a>
+            </h1>
+
+      <ul id="social-media">
+        
+        
+          
+        <li><a href="https://github.com/kiror0"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
+           
+      </ul>
+      
+      <p><em>No Clever Tagline Needed.</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/about/">
+                <i class="fa-li fa  fa-lg"></i><span>About Me</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>TPCTF 2017 - Bad Encryption Writeup</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2017-12-07T12:30:54Z">Dec 7, 2017</time>
+        </li>
+        
+        <li>
+            Categories:
+            <em>
+                
+                    
+                    <a href="http://zeroload.github.io/categories/rev">rev</a>
+                
+                    , 
+                    <a href="http://zeroload.github.io/categories/writeup">writeup</a>
+                
+            </em>
+        </li>
+        
+
+        
+
+        <li>3 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <blockquote>
+<p>I was making an encryption program, but it is far from perfect. Instead of make the encryption work, I decided to just encrypt everything 100 times. Hint : I bet the encryption works at least most of the time.</p>
+</blockquote>
+<p>Diberikan 2 file, yakni encode.py dan encoded.zip. Python : <a href="https://paste.safe.moe/erebibexes.coffee">https://paste.safe.moe/erebibexes.coffee</a> ZIP: <a href="https://a.safe.moe/qUbq4.zip">https://a.safe.moe/qUbq4.zip</a> (md5sum 15906c946870428ba60f88bae2e679f3) Unzip file encoded.zip, akan didapat file out[0-99].png. Lalu, analisa file encode.py,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/env python2</span>
+
+<span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">101</span>):
+    tel1l1l1l1l1l1l1lt <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">REDACTED</span><span style="color:#e6db74">&#34;</span>
+    <span style="color:#f92672">import</span> builtins<span style="color:#f92672">,</span> random
+    l1l1l1l1l1l1l1l <span style="color:#f92672">=</span> getattr(builtins, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">__import__</span><span style="color:#e6db74">&#34;</span>)
+    l1l1l1l1l1l1l1l <span style="color:#f92672">=</span> l1l1l1l1l1l1l1l(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">PIL.Image</span><span style="color:#e6db74">&#34;</span>)
+    l1l1l1l1l1l1l1ll1l1l1l1l1l1l1l <span style="color:#f92672">=</span> l1l1l1l1l1l1l1l<span style="color:#f92672">.</span>Image
+    l1l1l1l1l1l1l1ll1l1l1l1l1l1l1ll1l1l1l1l1l1l1l <span style="color:#f92672">=</span> l1l1l1l1l1l1l1ll1l1l1l1l1l1l1l<span style="color:#f92672">.</span>new(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">RGB</span><span style="color:#e6db74">&#34;</span>, (len(tel1l1l1l1l1l1l1lt), <span style="color:#ae81ff">1</span>), <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">white</span><span style="color:#e6db74">&#34;</span>)
+    l1l1l1l1l1l1l1ll1l1l1l1l1l1l1ll1l1l1l1l1l1l1ll1l1l1l1l1l1l1l <span style="color:#f92672">=</span> l1l1l1l1l1l1l1ll1l1l1l1l1l1l1ll1l1l1l1l1l1l1l<span style="color:#f92672">.</span>load()
+    l1l1l1l1l1l1l1ll1l1l1l111l1l11 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">for</span> l1l1l1l1l1l1l1ll1l1l1l1l1l1l11 <span style="color:#f92672">in</span> tel1l1l1l1l1l1l1lt:
+        l1l1l1l1l1l1l1ll1l1l1l1l1l1l11 <span style="color:#f92672">=</span> ord(l1l1l1l1l1l1l1ll1l1l1l1l1l1l11)
+        l1l1l1l1l1l1l1ll1l1l1l1lll1l111 <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">256</span>)
+        l1l1l1l1l1l1l1ll1l1l1l1lll1l112 <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">256</span>)
+        l1l1l1l1l1l1l1ll1l1l1l1lll1l113 <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">256</span>)
+        l1l1l1l1l1l1l11ll1l1l1l1lll1l111 <span style="color:#f92672">=</span> (l1l1l1l1l1l1l1ll1l1l1l1lll1l111<span style="color:#f92672">/</span><span style="color:#ae81ff">256</span>)
+        l1l1l1l1l1l1l11ll1l1l1l1lll1l112 <span style="color:#f92672">=</span> (l1l1l1l1l1l1l1ll1l1l1l1lll1l112<span style="color:#f92672">/</span><span style="color:#ae81ff">256</span>)
+        l1l1l1l1l1l1l11ll1l1l1l1lll1l113 <span style="color:#f92672">=</span> (l1l1l1l1l1l1l1ll1l1l1l1lll1l113<span style="color:#f92672">/</span><span style="color:#ae81ff">256</span>)
+        l1l121l1l1l1l11ll1l1l1l1lll1l111 <span style="color:#f92672">=</span> l1l1l1l1l1l1l1ll1l1l1l1l1l1l11<span style="color:#f92672">*</span>l1l1l1l1l1l1l11ll1l1l1l1lll1l111
+        l1l121l1l1l1l11ll1l1l1l1lll1l112 <span style="color:#f92672">=</span> l1l121l1l1l1l11ll1l1l1l1lll1l111<span style="color:#f92672">*</span>l1l1l1l1l1l1l11ll1l1l1l1lll1l112
+        l1l1l1l1l1l1l1ll1l1l1l1l1l1l1ll1l1l1l1l1l1l1ll1l1l1l1l1l1l1l[l1l1l1l1l1l1l1ll1l1l1l111l1l11,<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> (l1l1l1l1l1l1l1ll1l1l1l1lll1l111, l1l1l1l1l1l1l1ll1l1l1l1lll1l112, round(l1l121l1l1l1l11ll1l1l1l1lll1l112<span style="color:#f92672">*</span><span style="color:#ae81ff">10</span>))
+        l1l1l1l1l1l1l1ll1l1l1l111l1l11 <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+    l1l1l1l1l1l1l1ll1l1l1l1l1l1l1ll1l1l1l1l1l1l1l<span style="color:#f92672">.</span>save(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">out</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">+</span>str(i)<span style="color:#f92672">+</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">.png</span><span style="color:#e6db74">&#34;</span>)
+</code></pre></div><p>Ugh.. Variabelnya agak sedikit membingunkan, coba diperbaiki sedikit, hasilnya</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">101</span>):
+    realflag <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">REDACTED</span><span style="color:#e6db74">&#34;</span>
+    <span style="color:#f92672">import</span> builtins<span style="color:#f92672">,</span> random
+    _import <span style="color:#f92672">=</span> getattr(builtins, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">__import__</span><span style="color:#e6db74">&#34;</span>)
+    _import <span style="color:#f92672">=</span> _import(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">PIL.Image</span><span style="color:#e6db74">&#34;</span>)
+    _PIL_image <span style="color:#f92672">=</span> _import<span style="color:#f92672">.</span>Image
+    _new_image <span style="color:#f92672">=</span> _PIL_image<span style="color:#f92672">.</span>new(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">RGB</span><span style="color:#e6db74">&#34;</span>, (len(realflag), <span style="color:#ae81ff">1</span>), <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">white</span><span style="color:#e6db74">&#34;</span>)
+    _image_pixels <span style="color:#f92672">=</span> _new_image<span style="color:#f92672">.</span>load()
+    pos <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> realflag:
+        i <span style="color:#f92672">=</span> ord(i)
+        rand1 <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">256</span>)
+        rand2 <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">256</span>)
+        rand3 <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">256</span>)
+        rand1div <span style="color:#f92672">=</span> (rand1<span style="color:#f92672">/</span><span style="color:#ae81ff">256</span>)
+        rand2div <span style="color:#f92672">=</span> (rand2<span style="color:#f92672">/</span><span style="color:#ae81ff">256</span>)
+        rand3div <span style="color:#f92672">=</span> (rand3<span style="color:#f92672">/</span><span style="color:#ae81ff">256</span>)
+        _k <span style="color:#f92672">=</span> i<span style="color:#f92672">*</span>rand1div
+        _k <span style="color:#f92672">=</span> _k<span style="color:#f92672">*</span>rand2div
+        _image_pixels[pos,<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> (rand1, rand2, round(_k<span style="color:#f92672">*</span><span style="color:#ae81ff">10</span>))
+        pos <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+    _new_image<span style="color:#f92672">.</span>save(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">out</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">+</span>str(i)<span style="color:#f92672">+</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">.png</span><span style="color:#e6db74">&#34;</span>)
+</code></pre></div><p>Dari kode tersebut dapat diketahui <code>realflag</code> dienkripsi dengan</p>
+<p>$$ enc[i] = round(realflag[i] \times \frac{rand1}{256} \times \frac{rand2}{256} \times 10)&amp;bg=1b1b1b&amp;s=2 $$</p>
+<p>dan disimpan kedalam file out[0-99].png pada nilai pixel BLUE. Nah, rand1 dan rand2 sendiri terdapat pada nilai pixel RED dan GREEN. Ada hal yang menarik dari cara enkripsi ini. Pada enkripsi, digunakan fungsi round() yang dapat memiliki &lsquo;dualisme nilai&rsquo; atau nilai yang biasa saya sebut &lsquo;off-by-one&rsquo;. Seperti yang tertera pada hint, &lsquo;I bet the encryption works at least most of the time&rsquo;, enkripsi ini diperkirakan bisa saja gagal. Salah satu cara untuk mengembalikan flag adalah dengan bruteforce printable character satu per satu dan membandingkan hasilnya dengan enc[i], namun karena disini enkripsinya bisa saja gagal maka, diperlukan tabel frekuensi seringnya muncul dari hasil enkripsi karakter tersebut. Nah, flagnya sendiri bisa jadi didapat dari karakter dengan kemunculan terbanyak. Berikut script python-nya,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> PIL.Image
+
+alpha <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ{}_!@#$</span><span style="color:#e6db74">%</span><span style="color:#e6db74">^&amp;*()_+:;[]|&lt;&gt;,./?</span><span style="color:#e6db74">&#39;</span>
+flag <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#39;</span>
+<span style="color:#75715e"># image.w = 38; image.h = 1</span>
+freq <span style="color:#f92672">=</span> [[<span style="color:#ae81ff">0</span> <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> xrange(len(alpha))] <span style="color:#66d9ef">for</span> r <span style="color:#f92672">in</span> xrange(<span style="color:#ae81ff">38</span>)]
+
+<span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">101</span>):
+    image <span style="color:#f92672">=</span> PIL<span style="color:#f92672">.</span>Image<span style="color:#f92672">.</span>open(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">encode/out</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">.png</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> i)
+    w <span style="color:#f92672">=</span> image<span style="color:#f92672">.</span>width
+    h <span style="color:#f92672">=</span> image<span style="color:#f92672">.</span>height <span style="color:#75715e"># always 1</span>
+    pixels <span style="color:#f92672">=</span> image<span style="color:#f92672">.</span>load()
+    <span style="color:#66d9ef">for</span> pos <span style="color:#f92672">in</span> xrange(w):
+        rand1, rand2, enc <span style="color:#f92672">=</span> pixels[pos, <span style="color:#ae81ff">0</span>]
+        <span style="color:#66d9ef">for</span> a <span style="color:#f92672">in</span> xrange(len(alpha)):
+            <span style="color:#66d9ef">if</span> round(ord(alpha[a])<span style="color:#f92672">*</span>rand1<span style="color:#f92672">*</span>rand2<span style="color:#f92672">*</span><span style="color:#ae81ff">10</span><span style="color:#f92672">/</span><span style="color:#ae81ff">0x10000</span>) <span style="color:#f92672">==</span> enc:
+                freq[pos][a] <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+
+<span style="color:#66d9ef">for</span> pos <span style="color:#f92672">in</span> xrange(w):
+    flag <span style="color:#f92672">+</span><span style="color:#f92672">=</span> alpha[ freq[pos]<span style="color:#f92672">.</span>index( max( freq[pos]) ) ]
+<span style="color:#66d9ef">print</span> flag
+</code></pre></div><p>Setelah dijalankan, didapat hasil <code>uqdtf{i_c4ou_7h1ok_0f_a_gUnoy_f14g_:(}</code> Hmm.. formatnya mirip flag tapi masih salah :(. Nah, disinilah kenapa disebut tadi &lsquo;off-by-one&rsquo;. uqdtf -&gt; tpctf, terlihat jelas untuk beberapa kasus, frekuensi karakter yang muncul ternyata lebih banyak atau sama dengan karakter setelah huruf tersebut.</p>
+<p><code>t -&gt; u</code></p>
+<p><code>p -&gt; q</code></p>
+<p><code>c -&gt; d</code></p>
+<p>&hellip;</p>
+<p>Agak dibenerin sedikit karakternya supaya bisa terbaca dan &lsquo;make sense&rsquo; saat diartikan dengan cara nge-dukun, didapat flag <code>tpctf{i_c4nt_7h1nk_0f_a_fUnny_f14g_:(}</code></p>
+<p>FLAG : <code>tpctf{i_c4nt_7h1nk_0f_a_fUnny_f14g_:(}</code></p>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://zeroload.github.io/posts/tuctf-2017-reverse-engineering-writeup/"><i class="fa fa-chevron-circle-left"></i> TUCTF 2017 - Reverse Engineering Writeup</a>
+        </li>
+        
+        
+        <li>
+            <a href="http://zeroload.github.io/posts/seccon-2017-powerful-shell-writeup/">SECCON 2017 - Powerful_Shell Writeup <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - kiror0 |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://zeroload.github.io/index.xml">Subscribe</a></h6>
+    </footer>
+</div>
+<script src="http://zeroload.github.io/js/scripts.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146594173-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>
