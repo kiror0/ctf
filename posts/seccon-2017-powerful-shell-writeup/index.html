@@ -1,0 +1,457 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Catousify</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The HTML5 Herald" />
+  <meta name="author" content="kiror0" /><meta name="generator" content="Hugo 0.62.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
+  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/ctf/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="http://zeroload.github.io/ctf/">Catousify</a>
+            </h1>
+
+      <ul id="social-media">
+        
+        
+          
+        <li><a href="https://github.com/kiror0"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
+           
+      </ul>
+      
+      <p><em>No Clever Tagline Needed.</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/about/">
+                <i class="fa-li fa  fa-lg"></i><span>About Me</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>SECCON 2017 - Powerful_Shell Writeup</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2017-12-11T10:27:58Z">Dec 11, 2017</time>
+        </li>
+        
+        <li>
+            Categories:
+            <em>
+                
+                    
+                    <a href="http://zeroload.github.io/ctf/categories/rev">rev</a>
+                
+                    , 
+                    <a href="http://zeroload.github.io/ctf/categories/writeup">writeup</a>
+                
+            </em>
+        </li>
+        
+
+        
+
+        <li>25 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <blockquote>
+<p>Powerful_Shell 300 points Powerful_Shell Crack me. powerful_shell.ps1-1fb3af91eafdbebf3b3efa3b84fcc10cfca21ab53db15c98797b500c739b0024 <a href="https://a.safe.moe/fmq8i.ps1-1fb3af91eafdbebf3b3efa3b84fcc10cfca21ab53db15c98797b500c739b0024">Download</a></p>
+</blockquote>
+<p>Diberikan sebuah file powershell. Untuk menjalankan filenya, bisa menggunakan pwsh di Linux/PowerShell di Windows.</p>
+<pre><code>$ECCON=&quot;&quot;;
+$ECCON+=\[char\](3783/291);
+$ECCON+=\[char\](6690/669);
+$ECCON+=\[char\](776-740);
+$ECCON+=\[char\](381-312);
+$ECCON+=\[char\](403-289);
+$ECCON+=\[char\](-301+415);
+$ECCON+=\[char\](143-32);
+$ECCON+=\[char\](93594/821);
+....
+$ECCON+=\[char\](721-708);
+$ECCON+=\[char\](803-793);
+$ECCON+=\[char\](10426/802);
+Write-Progress -Activity &quot;Extracting Script&quot; -status &quot;20040&quot; -percentComplete 99;
+$ECCON+=\[char\](520-510);
+Write-Progress -Completed -Activity &quot;Extracting Script&quot;;.(\[ScriptBlock\]::Create($ECCON))
+</code></pre><p>Hmm&hellip; seems legit. File ini akan mengeksekusi sesuatu di $ECCON. Nah, daripada dieksekusi drop saja variabel $ECCON ke suatu file agar bisa di analisa lebih lanjut dengan mengganti line terakhir menjadi</p>
+<pre><code>...
+$ECCON+=\[char\](721-708);
+$ECCON+=\[char\](803-793);
+$ECCON+=\[char\](10426/802);
+Write-Progress -Activity &quot;Extracting Script&quot; -status &quot;20040&quot; -percentComplete 99;
+$ECCON+=\[char\](520-510);
+$ECCON &gt;&gt; eccon.ps1
+</code></pre><p>Output dari eccon.ps1 seperti berikut,</p>
+<pre><code>$ErrorActionPreference = &quot;ContinueSilently&quot;
+\[console\]::BackgroundColor = &quot;black&quot;;\[console\]::ForegroundColor = &quot;white&quot;;cls;Set-Alias -Name x -Value Write-Host;$host.UI.RawUI.BufferSize = New-Object System.Management.Automation.Host.Size 95,25;$host.UI.RawUI.WindowSize = New-Object System.Management.Automation.Host.Size 95,25;$host.UI.RawUI.BufferSize = New-Object System.Management.Automation.Host.Size 95,25;$host.UI.RawUI.WindowSize = New-Object System.Management.Automation.Host.Size 95,25;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x;x '  ' -b 15 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 12 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 0 -n;x '  ' -b 15 -n;x;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x '  ' -b 15 -n;x;x;
+
+
+Write-Host -b 00 -f 15 Checking Host... Please wait... -n
+Try{
+    If ((Get-EventLog -LogName Security | Where EventID -Eq 4624).Length -Lt 1000) {
+        Write-Host &quot;This host is too fresh!&quot;
+        Exit
+    }
+}Catch{
+    Write-Host &quot;Failed: No admin rights!&quot;
+    Exit
+}
+Write-Host &quot;Check passed&quot;
+
+$keytone=@{'a'=261.63}
+$pk='a'
+ForEach($k in ('w','s','e','d','f','t','g','y','h','u','j','k')){
+    $keytone+=@{$k=$keytone\[$pk\]*\[math\]::pow(2,1/12)};$pk=$k    
+}
+Write-Host -b 00 -f 15 &quot;Play the secret melody.&quot;
+
+Write-Host -b 15 -f 00 -n '   '
+Write-Host -b 00 -f 15 -n '   '
+Write-Host -b 15 -f 00 -n '  '
+Write-Host -b 00 -f 15 -n '   '
+Write-Host -b 15 -f 00 -n '   |   '
+Write-Host -b 00 -f 15 -n '   '
+Write-Host -b 15 -f 00 -n '  '
+Write-Host -b 00 -f 15 -n '   '
+Write-Host -b 15 -f 00 -n '  '
+Write-Host -b 00 -f 15 -n '   '
+Write-Host -b 15 -f 00 '   |    ' 
+Write-Host -b 15 -f 00 -n '   '
+Write-Host -b 00 -f 15 -n '   '
+Write-Host -b 15 -f 00 -n '  '
+Write-Host -b 00 -f 15 -n '   '
+Write-Host -b 15 -f 00 -n '   |   '
+Write-Host -b 00 -f 15 -n '   '
+Write-Host -b 15 -f 00 -n '  '
+Write-Host -b 00 -f 15 -n '   '
+Write-Host -b 15 -f 00 -n '  '
+Write-Host -b 00 -f 15 -n '   '
+Write-Host -b 15 -f 00 '   |    ' 
+Write-Host -b 15 -f 00 -n '   '
+Write-Host -b 00 -f 15 -n ' w '
+Write-Host -b 15 -f 00 -n '  '
+Write-Host -b 00 -f 15 -n ' e '
+Write-Host -b 15 -f 00 -n '   |   '
+Write-Host -b 00 -f 15 -n ' t '
+Write-Host -b 15 -f 00 -n '  '
+Write-Host -b 00 -f 15 -n ' y '
+Write-Host -b 15 -f 00 -n '  '
+Write-Host -b 00 -f 15 -n ' u '
+Write-Host -b 15 -f 00 '   |    ' 
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00  '    '
+Write-Host -b 15 -f 00 -n '  a |'
+Write-Host -b 15 -f 00 -n '  s |'
+Write-Host -b 15 -f 00 -n '  d |'
+Write-Host -b 15 -f 00 -n '  f |'
+Write-Host -b 15 -f 00 -n '  g |'
+Write-Host -b 15 -f 00 -n '  h |'
+Write-Host -b 15 -f 00 -n '  j |'
+Write-Host -b 15 -f 00  '  k '
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00 -n '    |'
+Write-Host -b 15 -f 00  '    '
+Write-Host
+$stage1=@();$f=&quot;&quot;;
+While($stage1.length -lt 14){
+    $key=(Get-Host).ui.RawUI.ReadKey(&quot;NoEcho,IncludeKeyDown&quot;)
+    $k=\[String\]$key.Character
+    $f+=$k;
+    If($keytone.Contains($k)){
+        $stage1+=\[math\]::floor($keytone\[$k\])
+        \[console\]::beep($keytone\[$k\],500)
+    }
+}
+$secret=@(440,440,493,440,440,493,440,493,523,493,440,493,440,349)
+If($secret.length -eq $stage1.length){
+    For ($i=1; $i -le $secret.length; $i++) {
+        If($secret\[$i\] -ne $stage1\[$i\]){
+            Exit
+        }
+    }
+    x &quot;Correct. Move to the next stage.&quot;
+}
+$text=@&quot;
+YkwRUxVXQ05DQ1NOE1sVVU4TUxdTThBBFVdDTUwTURVTThMqFldDQUwdUxVRTBNEFVdAQUwRUxtT
+TBEzFVdDQU8RUxdTbEwTNxVVQUNOEFEVUUwdQBVXQ0NOE1EWUUwRQRtVQ0FME1EVUU8RThdVTUNM
+EVMVUUwRFxdVQUNCE1MXU2JOE0gWV0oxSk1KTEIoExdBSDBOE0MVO0NKTkAoERVDSTFKThNNFUwR
+FBVINUFJTkAqExtBSjFKTBEoF08RVRdKO0NKTldKMUwRQBc1QUo7SlNgTBNRFVdJSEZCSkJAKBEV
+QUgzSE8RQxdMHTMVSDVDSExCKxEVQ0o9SkwRQxVOE0IWSDVBSkJAKBEVQUgzThBXFTdDRExAKhMV
+Q0oxTxEzFzVNSkxVSjNOE0EWN0NITE4oExdBSjFMEUUXNUNTbEwTURVVSExCKxEVQ0o9SkwRQxVO
+EzEWSDVBSkJAKBEVQUgzThAxFTdDREwTURVKMUpOECoVThNPFUo3U0pOE0gWThNEFUITQBdDTBFK
+F08RQBdMHRQVQUwTSBVOEEIVThNPFUNOE0oXTBFDF0wRQRtDTBFKFU4TQxZOExYVTUwTSBVMEUEX
+TxFOF0NCE0oXTBNCFU4QQRVBTB1KFU4TThdMESsXQ04TRBVMEUMVThNXFk4TQRVNTBNIFUwRFBdP
+EUEXQ0ITShdME0EVThBXFU4TWxVDThNKF0wRMBdMETUbQ0wRShVOE0MWThMqFU1ME0gVTBFDF08R
+QxdMHUMVQUwTSBVOEEEVThNNFUwRNRVBTBFJF0wRQxtME0EVTBFAF0BOE0gVQhNGF0wTKhVBTxFK
+F0wdMxVOEzUXQ04QSBVOE0AVTBFVFUFMEUkXTBFDG0wTQRVMETMXQE4TSBVCE0MXTBNBFU4QQRVB
+TB1KFU4TQxdMEVYXTBEUG0NMEUoVThNBFk4TQRVCEygXQ0wRShdPEUMXTB1DFU4TQBdDThBIFU4T
+SBVMESgVQUwRSRdMEUYbTBMWFUNOE0gWThNCFUITFBdDTBFKF08RQxdMHUMVThNVF0NOEEgVThNN
+FUwRQxVOE0IWQUwRShtME0EVTBFVF08RQxdDQhNKF0wTQRVOEEEVThM9FUNOE0oXTBFFF0wRKBtD
+TBFKFU4TQRZOE0EVQhNAF0NMEUoXTxFDF0wdVRVOEzMXQ04QSBVOE00VTBFVFU4TQRZBTBFKG0wT
+RBVMESgXQE4TSBVCE0MXTBNBFU4QKhVBTB1KFU4TFBdMEUIXQ04TRBVMEUMVThNBFk4TNxVNTBNI
+FUwRQxdPEUMXTB01FUFME0gVThBBFU4TTRVMERQVQUwRSRdMEUMbTBNBFUwRQxdAThNIFUITQxdM
+E0EVThAxFUFMHUoVThNDF0wRVhdMEVUbQ0wRShVOE0QWThMWFU1ME0gVTBFDF08RRhdDQhNKF0wT
+QRVOEFcVQUwdShVOE0EXTBFFF0NOE0QVTBFDFU4TVxZOEyoVTUwTSBVMETMXTxFVF0NCE0oXTBNE
+FU4QQhVBTB1KFU4TQBdMERcXQ04TRBVMEUAVThNDFkFMEUobTBNCFUwRQRdAThNIFUITQRdMExYV
+QU8RShdMHUEVThNOF0NOEEgVThNIFUwRKBVBTBFJF0wRMxtMEzcVQ04TSBZOE0EVQhNVF0wTQRVB
+TxFKF0wdQxVOE0MXTBFFF0NOE0QVTBFGFU4TKhZBTBFKG0wTRBVMERQXQE4TSBVCE04XTBNXFUFP
+EUoXTB0zFU4TThdDThBIFU4TTRVMEUMVThMWFkFMEUobTBNCFUwRFBdAThNIFUITQxdME0EVThAx
+FUFMHUoVThNGF0wRQxdDThNEFUwRQRVOEyoWQUwRShtMEzcVTBFDF0BOE0gVQhMzF0wTFhVBTxFK
+F0wdMxVOExQXQ04QSBVOE0gVTBEUFUFMEUkXTBEzG0wTQRVDThNIFk4TQRVCEygXTBNEFUFPEUoX
+TB1DFU4TRhdDThBIFU4TTRVMEVUVQUwRSRdMERQbQ0wRShVOE0wWThNDFU1ME0gVTBFDF08RQxdM
+HTMVQUwTSBVOEEEVThNbFUwRNRVBTBFJF0wRQxtME0EVTBFAF0BOE0gVQhNDF0wTVxVOEEEVQUwd
+ShVOEzMXTBE2F0NOE0QVTBFBFU4TKhZBTBFKG0wTQRVMEUMXTxFDF0NCE0oXTBNBFU4QQRVOEzsV
+Q04TShdMEUAXTBFDG0wTQhVDThNIFk4TRBVCEygXQ0wRShdPEUYXTB0UFUFME0gVThBDFU4TTRVD
+ThNKF0wRQBdMEUMbTBNBFUNOE0gWThNBFUITQxdME0EVQU8RShdMHUMVThNVF0wRVhdDThNEFUwR
+RhVOEyoWQUwRShtME0MVTBEzF0BOE0gVQhNDF0wTQRVOEEEVQUwdShVOExQXTBFNF0NOE0QVTBFG
+FU4TRBZBTBFKG0wTRBVMERQXQE4TSBVCEzUXTBMWFUFPEUoXTB1DFU4TRhdDThBIFU4TTRVMEVUV
+QUwRSRdMERQbQ0wRShVOE0wWThNDFU1ME0gVTBFDF08RQxdMHTMVQUwTSBVOEEEVThNbFUwRNRVB
+TBFJF0wRQxtME0EVTBFAF0BOE0gVQhNDF0wTVxVOEEEVQUwdShVOEzMXTBE2F0NOE0QVTBFBFU4T
+KhZBTBFKG0wTQRVMEUMXTxFDF0NCE0oXTBNBFU4QQRVOEzsVQ04TShdMEUAXTBFDG0wTQhVDThNI
+Fk4TRBVCEygXQ0wRShdPEUYXTB0zFUFME0gVThBMFU4TSBVDThNKF0wRQxdMERQbQ0wRShVOE0IW
+ThNDFU1ME0gVTBFAF08RQRdDQhNKF0wTQxVOEBYVQUwdShVOE0EXTBFNF0NOE0QVTBFDFU4TKhZO
+E0QVTUwTSBVMEUYXTxFAF0NCE0oXTBNCFU4QFhVBTB1KFU4TQBdMEUIXQ04TRBVMEUAVThNDFkFM
+EUobTBNDFUwRFBdAThNIFUITQRdME0wVQU8RShdMHUMVThMoF0wRNhdDThNEFUwRRhVOEzEWQUwR
+ShtME0EVTBFGF0BOE0gVQhNDF0wTVxVBTxFKF0wdQxVOEygXTBE2FxROE10VShZOTBFTF2E=
+&quot;@
+
+$plain=@()
+$byteString = \[System.Convert\]::FromBase64String($text)
+$xordData = $(for ($i = 0; $i -lt $byteString.length; ) {
+    for ($j = 0; $j -lt $f.length; $j++) {
+        $plain+=$byteString\[$i\] -bxor $f\[$j\]
+        $i++
+        if ($i -ge $byteString.Length) {
+            $j = $f.length
+        }
+    }
+})
+iex(\[System.Text.Encoding\]::ASCII.GetString($plain))
+</code></pre><p>Uh oh.. masih bersangkutan dengan Powershell lagi. Script ini juga akan mengeksekusi sesuatu di variabel <code>plain</code>. <code>plain</code> ini didapat dari <code>bas64decode($text)</code> yang dixor dengan <code>f</code>. <code>f</code> sendiri didapat dengan membandingkan input <code>stage1</code> dengan <code>secret</code>.</p>
+<pre><code>$stage1=@();$f=&quot;&quot;;
+While($stage1.length -lt 14){
+    $key=(Get-Host).ui.RawUI.ReadKey(&quot;NoEcho,IncludeKeyDown&quot;)
+    $k=\[String\]$key.Character
+    $f+=$k;
+    If($keytone.Contains($k)){
+        $stage1+=\[math\]::floor($keytone\[$k\])
+        \[console\]::beep($keytone\[$k\],500)
+    }
+}
+$secret=@(440,440,493,440,440,493,440,493,523,493,440,493,440,349)
+If($secret.length -eq $stage1.length){
+    For ($i=1; $i -le $secret.length; $i++) {
+        If($secret\[$i\] -ne $stage1\[$i\]){
+            Exit
+        }
+    }
+    x &quot;Correct. Move to the next stage.&quot;
+}
+</code></pre><p><code>stage1</code> ini diperoleh nilai floor dari <code>keytone</code>. Untuk mengetahui value dari <code>keytone*</code>, jalanlkan sebagian code yang didapat dari script ini,</p>
+<pre><code>$keytone=@{'a'=261.63}
+$pk='a'
+ForEach($k in ('w','s','e','d','f','t','g','y','h','u','j','k')){
+    $keytone+=@{$k=$keytone\[$pk\]*\[math\]::pow(2,1/12)};$pk=$k    
+}
+</code></pre><p>Value dari keytone</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t</td>
+<td>370.000694323673</td>
+</tr>
+<tr>
+<td>e</td>
+<td>311.132257498162</td>
+</tr>
+<tr>
+<td>w</td>
+<td>277.187329377222</td>
+</tr>
+<tr>
+<td>d</td>
+<td>329.633144283996</td>
+</tr>
+<tr>
+<td>a</td>
+<td>261.63</td>
+</tr>
+<tr>
+<td>g</td>
+<td>392.002080523246</td>
+</tr>
+<tr>
+<td>s</td>
+<td>293.669745699181</td>
+</tr>
+<tr>
+<td>k</td>
+<td>523.26</td>
+</tr>
+<tr>
+<td>u</td>
+<td>466.171663254114</td>
+</tr>
+<tr>
+<td>j</td>
+<td>493.891672853823</td>
+</tr>
+<tr>
+<td>y</td>
+<td>415.31173722644</td>
+</tr>
+<tr>
+<td>f</td>
+<td>349.234151046506</td>
+</tr>
+<tr>
+<td>h</td>
+<td>440.007458245659</td>
+</tr>
+</tbody>
+</table>
+<p>Bandingkan dengan $secret</p>
+<pre><code>$secret=@(440,440,493,440,440,493,440,493,523,493,440,493,440,349)
+</code></pre><p><code>440 -&gt; h 440 -&gt; h 493 -&gt; j ...</code> Nah, dari hasil nguli didapat <code>$f = hhjhhjhjkjhjhf</code>. Pakai python buat xor decrypt $text dengan key $f. Lalu didapatkan&hellip;. masih script Powershell <code>lagi</code>. Berikut scriptnya,</p>
+<pre><code>${;}=+$();
+${=}=${;};
+${+}=++${;};
+${@}=++${;};
+${.}=++${;};
+${\[}=++${;};
+${\]}=++${;};
+${(}=++${;};
+${)}=++${;};
+${&amp;}=++${;};
+${|}=++${;};
+${&quot;}=&quot;\[&quot;+&quot;$(@{})&quot;\[${)}\]+&quot;$(@{})&quot;\[&quot;${+}${|}&quot;\]+&quot;$(@{})&quot;\[&quot;${@}${=}&quot;\]+&quot;$?&quot;\[${+}\]+&quot;\]&quot;;
+${;}=&quot;&quot;.(&quot;$(@{})&quot;\[&quot;${+}${\[}&quot;\]+&quot;$(@{})&quot;\[&quot;${+}${(}&quot;\]+&quot;$(@{})&quot;\[${=}\]+&quot;$(@{})&quot;\[${\[}\]+&quot;$?&quot;\[${+}\]+&quot;$(@{})&quot;\[${.}\]);
+${;}=&quot;$(@{})&quot;\[&quot;${+}${\[}&quot;\]+&quot;$(@{})&quot;\[${\[}\]+&quot;${;}&quot;\[&quot;${@}${)}&quot;\];&quot;${&quot;}${.}${(}+${&quot;}${(}${|}+${&quot;}${(}${)}+${&quot;}${(}${)}+${&quot;}${)}${|}+${&quot;}${)}${&amp;}+${&quot;}${(}${+}+${&quot;}${&amp;}${@}+${&quot;}${+}${=}${+}+${&quot;}${|}${)}+${&quot;}${+}${=}${=}+${&quot;}${\[}${\]}+${&quot;}${)}${@}+${&quot;}${+}${+}${+}+${&quot;}${+}${+}${\]}+${&quot;}${+}${+}${(}+${&quot;}${.}${@}+${&quot;}${\[}${\]}+${&quot;}${&amp;}${=}+${&quot;}${+}${+}${\[}+${&quot;}${+}${+}${+}+${&quot;}${+}${=}${|}+${&quot;}${+}${+}${@}+${&quot;}${+}${+}${(}+${&quot;}${.}${@}+${&quot;}${.}${|}+${&quot;}${(}${|}+${&quot;}${+}${+}${=}+${&quot;}${+}${+}${(}+${&quot;}${+}${=}${+}+${&quot;}${+}${+}${\[}+${&quot;}${.}${@}+${&quot;}${+}${+}${(}+${&quot;}${+}${=}${\[}+${&quot;}${+}${=}${+}+${&quot;}${.}${@}+${&quot;}${+}${+}${@}+${&quot;}${|}${)}+${&quot;}${+}${+}${\]}+${&quot;}${+}${+}${\]}+${&quot;}${+}${+}${|}+${&quot;}${+}${+}${+}+${&quot;}${+}${+}${\[}+${&quot;}${+}${=}${=}+${&quot;}${.}${|}+${&quot;}${+}${.}+${&quot;}${+}${=}+${&quot;}${)}${.}+${&quot;}${+}${=}${@}+${&quot;}${\[}${=}+${&quot;}${.}${(}+${&quot;}${(}${|}+${&quot;}${(}${)}+${&quot;}${(}${)}+${&quot;}${)}${|}+${&quot;}${)}${&amp;}+${&quot;}${.}${@}+${&quot;}${\[}${\]}+${&quot;}${+}${=}${+}+${&quot;}${+}${+}${.}+${&quot;}${.}${@}+${&quot;}${.}${|}+${&quot;}${&amp;}${=}+${&quot;}${\[}${&amp;}+${&quot;}${+}${+}${|}+${&quot;}${(}${|}+${&quot;}${+}${+}${\[}+${&quot;}${.}${(}+${&quot;}${)}${@}+${&quot;}${\]}${+}+${&quot;}${\[}${|}+${&quot;}${\[}${|}+${&quot;}${.}${|}+${&quot;}${\[}${+}+${&quot;}${+}${@}${.}+${&quot;}${+}${.}+${&quot;}${+}${=}+${&quot;}${|}+${&quot;}${&amp;}${)}+${&quot;}${+}${+}${\[}+${&quot;}${+}${=}${\]}+${&quot;}${+}${+}${(}+${&quot;}${+}${=}${+}+${&quot;}${\[}${\]}+${&quot;}${)}${@}+${&quot;}${+}${+}${+}+${&quot;}${+}${+}${\]}+${&quot;}${+}${+}${(}+${&quot;}${.}${@}+${&quot;}${.}${|}+${&quot;}${)}${+}+${&quot;}${+}${+}${+}+${&quot;}${+}${+}${+}+${&quot;}${+}${=}${=}+${&quot;}${.}${@}+${&quot;}${)}${\[}+${&quot;}${+}${+}${+}+${&quot;}${|}${&amp;}+${&quot;}${.}${.}+${&quot;}${.}${|}+${&quot;}${\]}${|}+${&quot;}${+}${.}+${&quot;}${+}${=}+${&quot;}${|}+${&quot;}${&amp;}${)}+${&quot;}${+}${+}${\[}+${&quot;}${+}${=}${\]}+${&quot;}${+}${+}${(}+${&quot;}${+}${=}${+}+${&quot;}${\[}${\]}+${&quot;}${)}${@}+${&quot;}${+}${+}${+}+${&quot;}${+}${+}${\]}+${&quot;}${+}${+}${(}+${&quot;}${.}${@}+${&quot;}${.}${\[}+${&quot;}${&amp;}${.}+${&quot;}${(}${|}+${&quot;}${(}${)}+${&quot;}${(}${)}+${&quot;}${)}${|}+${&quot;}${)}${&amp;}+${&quot;}${+}${@}${.}+${&quot;}${.}${(}+${&quot;}${(}${|}+${&quot;}${(}${)}+${&quot;}${(}${)}+${&quot;}${)}${|}+${&quot;}${)}${&amp;}+${&quot;}${+}${@}${\]}+${&quot;}${.}${\[}+${&quot;}${+}${.}+${&quot;}${+}${=}+${&quot;}${+}${@}${\]}|${;}&quot;|&amp;${;}
+</code></pre><p>Oh, wow. Much code. Such Obfucate. Intinya, masih sama seperti pada sebelumnya, dengan menggunakan teknik drop value (read: echo) pada variabel satu-persatu.</p>
+<pre><code>PS /home/kyra/Downloads&gt; ${;}=+$();
+PS /home/kyra/Downloads&gt; ${=}=${;};
+PS /home/kyra/Downloads&gt; ${+}=++${;};
+PS /home/kyra/Downloads&gt; ${@}=++${;};
+PS /home/kyra/Downloads&gt; ${.}=++${;};
+PS /home/kyra/Downloads&gt; ${\[}=++${;};
+PS /home/kyra/Downloads&gt; ${\]}=++${;};
+PS /home/kyra/Downloads&gt; ${(}=++${;};
+PS /home/kyra/Downloads&gt; ${)}=++${;};
+PS /home/kyra/Downloads&gt; ${&amp;}=++${;};
+PS /home/kyra/Downloads&gt; ${|}=++${;};
+PS /home/kyra/Downloads&gt; ${&quot;}=&quot;\[&quot;+&quot;$(@{})&quot;\[${)}\]+&quot;$(@{})&quot;\[&quot;${+}${|}&quot;\]+&quot;$(@{})&quot;\[&quot;${@}${=}&quot;\]+&quot;$?&quot;\[${+}\]+&quot;\]&quot;;
+PS /home/kyra/Downloads&gt; ${;}=&quot;&quot;.(&quot;$(@{})&quot;\[&quot;${+}${\[}&quot;\]+&quot;$(@{})&quot;\[&quot;${+}${(}&quot;\]+&quot;$(@{})&quot;\[${=}\]+&quot;$(@{})&quot;\[${\[}\]+&quot;$?&quot;\[${+}\]+&quot;$(@{})&quot;\[${.}\]);
+PS /home/kyra/Downloads&gt; ${;}=&quot;$(@{})&quot;\[&quot;${+}${\[}&quot;\]+&quot;$(@{})&quot;\[${\[}\]+&quot;${;}&quot;\[&quot;${@}${)}&quot;\];&quot;${&quot;}${.}${(}+${&quot;}${(}${|}+${&quot;}${(}${)}+${&quot;}${(}${)}+${&quot;}${)}${|}+${&quot;}${)}${&amp;}+${&quot;}${(}${+}+${&quot;}${&amp;}${@}+${&quot;}${+}${=}${+}+${&quot;}${|}${)}+${&quot;}${+}${=}${=}+${&quot;}${\[}${\]}+${&quot;}${)}${@}+${&quot;}${+}${+}${+}+${&quot;}${+}${+}${\]}+${&quot;}${+}${+}${(}+${&quot;}${.}${@}+${&quot;}${\[}${\]}+${&quot;}${&amp;}${=}+${&quot;}${+}${+}${\[}+${&quot;}${+}${+}${+}+${&quot;}${+}${=}${|}+${&quot;}${+}${+}${@}+${&quot;}${+}${+}${(}+${&quot;}${.}${@}+${&quot;}${.}${|}+${&quot;}${(}${|}+${&quot;}${+}${+}${=}+${&quot;}${+}${+}${(}+${&quot;}${+}${=}${+}+${&quot;}${+}${+}${\[}+${&quot;}${.}${@}+${&quot;}${+}${+}${(}+${&quot;}${+}${=}${\[}+${&quot;}${+}${=}${+}+${&quot;}${.}${@}+${&quot;}${+}${+}${@}+${&quot;}${|}${)}+${&quot;}${+}${+}${\]}+${&quot;}${+}${+}${\]}+${&quot;}${+}${+}${|}+${&quot;}${+}${+}${+}+${&quot;}${+}${+}${\[}+${&quot;}${+}${=}${=}+${&quot;}${.}${|}+${&quot;}${+}${.}+${&quot;}${+}${=}+${&quot;}${)}${.}+${&quot;}${+}${=}${@}+${&quot;}${\[}${=}+${&quot;}${.}${(}+${&quot;}${(}${|}+${&quot;}${(}${)}+${&quot;}${(}${)}+${&quot;}${)}${|}+${&quot;}${)}${&amp;}+${&quot;}${.}${@}+${&quot;}${\[}${\]}+${&quot;}${+}${=}${+}+${&quot;}${+}${+}${.}+${&quot;}${.}${@}+${&quot;}${.}${|}+${&quot;}${&amp;}${=}+${&quot;}${\[}${&amp;}+${&quot;}${+}${+}${|}+${&quot;}${(}${|}+${&quot;}${+}${+}${\[}+${&quot;}${.}${(}+${&quot;}${)}${@}+${&quot;}${\]}${+}+${&quot;}${\[}${|}+${&quot;}${\[}${|}+${&quot;}${.}${|}+${&quot;}${\[}${+}+${&quot;}${+}${@}${.}+${&quot;}${+}${.}+${&quot;}${+}${=}+${&quot;}${|}+${&quot;}${&amp;}${)}+${&quot;}${+}${+}${\[}+${&quot;}${+}${=}${\]}+${&quot;}${+}${+}${(}+${&quot;}${+}${=}${+}+${&quot;}${\[}${\]}+${&quot;}${)}${@}+${&quot;}${+}${+}${+}+${&quot;}${+}${+}${\]}+${&quot;}${+}${+}${(}+${&quot;}${.}${@}+${&quot;}${.}${|}+${&quot;}${)}${+}+${&quot;}${+}${+}${+}+${&quot;}${+}${+}${+}+${&quot;}${+}${=}${=}+${&quot;}${.}${@}+${&quot;}${)}${\[}+${&quot;}${+}${+}${+}+${&quot;}${|}${&amp;}+${&quot;}${.}${.}+${&quot;}${.}${|}+${&quot;}${\]}${|}+${&quot;}${+}${.}+${&quot;}${+}${=}+${&quot;}${|}+${&quot;}${&amp;}${)}+${&quot;}${+}${+}${\[}+${&quot;}${+}${=}${\]}+${&quot;}${+}${+}${(}+${&quot;}${+}${=}${+}+${&quot;}${\[}${\]}+${&quot;}${)}${@}+${&quot;}${+}${+}${+}+${&quot;}${+}${+}${\]}+${&quot;}${+}${+}${(}+${&quot;}${.}${@}+${&quot;}${.}${\[}+${&quot;}${&amp;}${.}+${&quot;}${(}${|}+${&quot;}${(}${)}+${&quot;}${(}${)}+${&quot;}${)}${|}+${&quot;}${)}${&amp;}+${&quot;}${+}${@}${.}+${&quot;}${.}${(}+${&quot;}${(}${|}+${&quot;}${(}${)}+${&quot;}${(}${)}+${&quot;}${)}${|}+${&quot;}${)}${&amp;}+${&quot;}${+}${@}${\]}+${&quot;}${.}${\[}+${&quot;}${+}${.}+${&quot;}${+}${=}+${&quot;}${+}${@}${\]}|${;}&quot;
+\[CHar\]36+\[CHar\]69+\[CHar\]67+\[CHar\]67+\[CHar\]79+\[CHar\]78+\[CHar\]61+\[CHar\]82+\[CHar\]101+\[CHar\]97+\[CHar\]100+\[CHar\]45+\[CHar\]72+\[CHar\]111+\[CHar\]115+\[CHar\]116+\[CHar\]32+\[CHar\]45+\[CHar\]80+\[CHar\]114+\[CHar\]111+\[CHar\]109+\[CHar\]112+\[CHar\]116+\[CHar\]32+\[CHar\]39+\[CHar\]69+\[CHar\]110+\[CHar\]116+\[CHar\]101+\[CHar\]114+\[CHar\]32+\[CHar\]116+\[CHar\]104+\[CHar\]101+\[CHar\]32+\[CHar\]112+\[CHar\]97+\[CHar\]115+\[CHar\]115+\[CHar\]119+\[CHar\]111+\[CHar\]114+\[CHar\]100+\[CHar\]39+\[CHar\]13+\[CHar\]10+\[CHar\]73+\[CHar\]102+\[CHar\]40+\[CHar\]36+\[CHar\]69+\[CHar\]67+\[CHar\]67+\[CHar\]79+\[CHar\]78+\[CHar\]32+\[CHar\]45+\[CHar\]101+\[CHar\]113+\[CHar\]32+\[CHar\]39+\[CHar\]80+\[CHar\]48+\[CHar\]119+\[CHar\]69+\[CHar\]114+\[CHar\]36+\[CHar\]72+\[CHar\]51+\[CHar\]49+\[CHar\]49+\[CHar\]39+\[CHar\]41+\[CHar\]123+\[CHar\]13+\[CHar\]10+\[CHar\]9+\[CHar\]87+\[CHar\]114+\[CHar\]105+\[CHar\]116+\[CHar\]101+\[CHar\]45+\[CHar\]72+\[CHar\]111+\[CHar\]115+\[CHar\]116+\[CHar\]32+\[CHar\]39+\[CHar\]71+\[CHar\]111+\[CHar\]111+\[CHar\]100+\[CHar\]32+\[CHar\]74+\[CHar\]111+\[CHar\]98+\[CHar\]33+\[CHar\]39+\[CHar\]59+\[CHar\]13+\[CHar\]10+\[CHar\]9+\[CHar\]87+\[CHar\]114+\[CHar\]105+\[CHar\]116+\[CHar\]101+\[CHar\]45+\[CHar\]72+\[CHar\]111+\[CHar\]115+\[CHar\]116+\[CHar\]32+\[CHar\]34+\[CHar\]83+\[CHar\]69+\[CHar\]67+\[CHar\]67+\[CHar\]79+\[CHar\]78+\[CHar\]123+\[CHar\]36+\[CHar\]69+\[CHar\]67+\[CHar\]67+\[CHar\]79+\[CHar\]78+\[CHar\]125+\[CHar\]34+\[CHar\]13+\[CHar\]10+\[CHar\]125|iex
+</code></pre><p>Hm&hellip;? Another string again? Coba run untuk bagian yang banyak [CHar]-nya</p>
+<pre><code>PS /home/kyra/Downloads&gt; \[CHar\]36+\[CHar\]69+\[CHar\]67+\[CHar\]67+\[CHar\]79+\[CHar\]78+\[CHar\]61+\[CHar\]82+\[CHar\]101+\[CHar\]97+\[CHar\]100+\[CHar\]45+\[CHar\]72+\[CHar\]111+\[CHar\]115+\[CHar\]116+\[CHar\]32+\[CHar\]45+\[CHar\]80+\[CHar\]114+\[CHar\]111+\[CHar\]109+\[CHar\]112+\[CHar\]116+\[CHar\]32+\[CHar\]39+\[CHar\]69+\[CHar\]110+\[CHar\]116+\[CHar\]101+\[CHar\]114+\[CHar\]32+\[CHar\]116+\[CHar\]104+\[CHar\]101+\[CHar\]32+\[CHar\]112+\[CHar\]97+\[CHar\]115+\[CHar\]115+\[CHar\]119+\[CHar\]111+\[CHar\]114+\[CHar\]100+\[CHar\]39+\[CHar\]13+\[CHar\]10+\[CHar\]73+\[CHar\]102+\[CHar\]40+\[CHar\]36+\[CHar\]69+\[CHar\]67+\[CHar\]67+\[CHar\]79+\[CHar\]78+\[CHar\]32+\[CHar\]45+\[CHar\]101+\[CHar\]113+\[CHar\]32+\[CHar\]39+\[CHar\]80+\[CHar\]48+\[CHar\]119+\[CHar\]69+\[CHar\]114+\[CHar\]36+\[CHar\]72+\[CHar\]51+\[CHar\]49+\[CHar\]49+\[CHar\]39+\[CHar\]41+\[CHar\]123+\[CHar\]13+\[CHar\]10+\[CHar\]9+\[CHar\]87+\[CHar\]114+\[CHar\]105+\[CHar\]116+\[CHar\]101+\[CHar\]45+\[CHar\]72+\[CHar\]111+\[CHar\]115+\[CHar\]116+\[CHar\]32+\[CHar\]39+\[CHar\]71+\[CHar\]111+\[CHar\]111+\[CHar\]100+\[CHar\]32+\[CHar\]74+\[CHar\]111+\[CHar\]98+\[CHar\]33+\[CHar\]39+\[CHar\]59+\[CHar\]13+\[CHar\]10+\[CHar\]9+\[CHar\]87+\[CHar\]114+\[CHar\]105+\[CHar\]116+\[CHar\]101+\[CHar\]45+\[CHar\]72+\[CHar\]111+\[CHar\]115+\[CHar\]116+\[CHar\]32+\[CHar\]34+\[CHar\]83+\[CHar\]69+\[CHar\]67+\[CHar\]67+\[CHar\]79+\[CHar\]78+\[CHar\]123+\[CHar\]36+\[CHar\]69+\[CHar\]67+\[CHar\]67+\[CHar\]79+\[CHar\]78+\[CHar\]125+\[CHar\]34+\[CHar\]13+\[CHar\]10+\[CHar\]125
+$ECCON=Read-Host -Prompt 'Enter the password'
+If($ECCON -eq 'P0wEr$H311'){
+        Write-Host 'Good Job!';
+        Write-Host &quot;SECCON{$ECCON}&quot;
+}
+</code></pre><p>boom. That's the flag.</p>
+<p>FLAG : <code>SECCON{P0wEr$H311}</code></p>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/tpctf-2017-bad-encryption-writeup/"><i class="fa fa-chevron-circle-left"></i> TPCTF 2017 - Bad Encryption Writeup</a>
+        </li>
+        
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/idsecconf-2017-online-darwin-writeup/">IDSECCONF 2017 Online - Darwin Writeup <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - kiror0 |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://zeroload.github.io/ctf/index.xml">Subscribe</a></h6>
+    </footer>
+</div>
+<script src="http://zeroload.github.io/ctf/js/scripts.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146594173-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

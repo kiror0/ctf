@@ -1,0 +1,244 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Catousify</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The HTML5 Herald" />
+  <meta name="author" content="kiror0" /><meta name="generator" content="Hugo 0.62.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
+  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/ctf/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="http://zeroload.github.io/ctf/">Catousify</a>
+            </h1>
+
+      <ul id="social-media">
+        
+        
+          
+        <li><a href="https://github.com/kiror0"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
+           
+      </ul>
+      
+      <p><em>No Clever Tagline Needed.</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/about/">
+                <i class="fa-li fa  fa-lg"></i><span>About Me</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>HackToday 2018 - not /a/game</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2018-09-05T22:42:44Z">Sep 5, 2018</time>
+        </li>
+        
+        <li>
+            Categories:
+            <em>
+                
+                    
+                    <a href="http://zeroload.github.io/ctf/categories/rev">rev</a>
+                
+                    , 
+                    <a href="http://zeroload.github.io/ctf/categories/writeup">writeup</a>
+                
+            </em>
+        </li>
+        
+
+        
+
+        <li>4 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <blockquote>
+<p>Downloads:</p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/notagame/id.hacktoday.thisis.not.a.game.apk">id.hacktoday.thisis.not.a.game.apk</a></p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/notagame/unluac.py">solver.py</a></p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/notagame/xxtea.py">xxtea.py</a></p>
+</blockquote>
+<pre><code>cocos2dlua, Kill the Bug
+</code></pre><h2 id="intro">intro</h2>
+<p>Ada beberapa tahapan recon yang perlu dilakukan sebelum masuk ke reverse engineering. Judul sendiri sudah menjelaskan kalau aplikasi ini bukan game, dilihat dari jangka waktu lomba sendiri, tidak mungkin peserta memainkan sebuah game untuk mematikan serangga sebanyak 73311337 kali untuk mendapatkan flag. Meskipun sudah memakai program tambahan untuk <em>nge-cit</em>, flag tidak akan keluar (intended). Terus gimana?</p>
+<h2 id="recon">recon</h2>
+<p>Sedikit info dari hint dan skill gugel, cocos2dlua merupakan salah satu <em><strong>open source</strong></em> game engine yang lumayan banyak dipakai pada OS Android dan Kill the Bug meruapakan contoh sample project untuk game engine cocos2dlua (<a href="https://github.com/cocos2d/cocos2d-x-samples">cocos2d-x/cocos2d-x-samples</a>). Sebagian isi dari APK sendiri secara singkat seperti berikut,</p>
+<pre><code>λ › ls -l assets/src/
+total 20K
+drwxr-xr-x  4 zero zero 4096 Sep  5 22:54 app
+drwxr-xr-x 14 zero zero 4096 Sep  5 22:54 cocos
+-rw-r--r--  1 zero zero  670 Dec 31  1979 config.luac
+-rw-r--r--  1 zero zero  358 Dec 31  1979 main.luac
+drwxr-xr-x  3 zero zero 4096 Sep  5 22:54 packages
+λ › 
+λ › hexdump -n 16 -C ./assets/src/config.luac
+00000000  58 58 54 45 41 43 52 59  50 54 4b 43 12 4b 23 97  |XXTEACRYPTKC.K#.|
+λ › hexdump -n 16 -C ./assets/src/main.luac
+00000000  58 58 54 45 41 43 52 59  50 54 a4 61 43 31 00 f4  |XXTEACRYPT.aC1..|
+λ › hexdump -n 16 -C ./assets/src/app/MyApp.luac
+00000000  58 58 54 45 41 43 52 59  50 54 a9 b2 fa 7e df 4c  |XXTEACRYPT...~.L|
+</code></pre><p>Oops, bukan plaintext lua yang didapat tapi beberapa file dengan header yang hampir sama. Header pada file ini sebenarnya adalah hint lanjutan dalam soal ini. <code>XXTEACRYPT</code> ini adalah salah satu jenis block crypto yang digunakan cocos2dlx-lua untuk enkripsi source code gamenya.</p>
+<h2 id="reversing">reversing</h2>
+<p>Source code dari game ada di <a href="https://github.com/cocos2d/cocos2d-x-samples/blob/v3/samples/KillBug/">https://github.com/cocos2d/cocos2d-x-samples/blob/v3/samples/KillBug/</a> karena mau fokus mencari bagaimana dekripsi dari file luac, yang perlu diperhatikan bukan di Java atau Lua, tapi implementasi di native C{,++} itu sendiri. Dengan <em>grep</em>-ing dengan keyword XXTEA, didapat bagian yang menarik, yakni <a href="https://github.com/cocos2d/cocos2d-x-samples/blob/9f1472d9083a18853bb1fe97a337292f42abe44a/samples/KillBug/frameworks/runtime-src/Classes/AppDelegate.cpp#L67-L68">src</a></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">bool</span> AppDelegate<span style="color:#f92672">:</span><span style="color:#f92672">:</span>applicationDidFinishLaunching()
+{
+    ...
+    LuaStack<span style="color:#f92672">*</span> stack <span style="color:#f92672">=</span> engine<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>getLuaStack();
+    stack<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>setXXTEAKeyAndSign(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">2dxLua</span><span style="color:#e6db74">&#34;</span>, strlen(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">2dxLua</span><span style="color:#e6db74">&#34;</span>), <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">XXTEA</span><span style="color:#e6db74">&#34;</span>, strlen(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">XXTEA</span><span style="color:#e6db74">&#34;</span>));
+    ...
+}
+</code></pre></div><p>Dari sini sudah terlihat jelas bagaimana game mem-<em>prepare</em> untuk mendekripsi luac. Dalam contoh diatas <code>2dxLua</code> adalah key untuk dekripsi luac. Lanjut ke analisa di APK sendiri, native-lib ada di <code>lib/armeabi-v7a/libcocos2dlua.so</code>,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-asm" data-lang="asm">.text:<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">AD2E00</span> <span style="color:#75715e">; AppDelegate::applicationDidFinishLaunching(void)
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E00</span>                 <span style="color:#66d9ef">EXPORT</span> <span style="color:#66d9ef">_ZN11AppDelegate29applicationDidFinishLaunchingEv</span>
+.text:<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">AD2E00</span> <span style="color:#66d9ef">_ZN11AppDelegate29applicationDidFinishLaunchingEv</span>
+<span style="color:#a6e22e">...</span>
+.text:<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">AD2E4E</span>                 <span style="color:#66d9ef">LDR</span>             <span style="color:#66d9ef">R1</span>, [<span style="color:#66d9ef">SP</span>,<span style="color:#75715e">#0xA0+var_48]
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E50</span>                 <span style="color:#66d9ef">STR</span>             <span style="color:#66d9ef">R0</span>, [<span style="color:#66d9ef">SP</span>,<span style="color:#75715e">#0xA0+var_64]
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E52</span>                 <span style="color:#66d9ef">MOV</span>             <span style="color:#66d9ef">R0</span>, <span style="color:#66d9ef">R1</span>
+.text:<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">AD2E54</span>                 <span style="color:#66d9ef">BLX.W</span>           <span style="color:#66d9ef">j__ZN7cocos2d9LuaEngine11getLuaStackEv</span> <span style="color:#75715e">; cocos2d::LuaEngine::getLuaStack(void)
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E58</span>                 <span style="color:#66d9ef">STR</span>             <span style="color:#66d9ef">R0</span>, [<span style="color:#66d9ef">SP</span>,<span style="color:#75715e">#0xA0+var_50]
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E5A</span>                 <span style="color:#66d9ef">LDR</span>             <span style="color:#66d9ef">R0</span>, [<span style="color:#66d9ef">SP</span>,<span style="color:#75715e">#0xA0+var_50]
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E5C</span>                 <span style="color:#66d9ef">LDR</span>             <span style="color:#66d9ef">R1</span>, [<span style="color:#66d9ef">R0</span>]
+.text:<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">AD2E5E</span>                 <span style="color:#66d9ef">LDR</span>             <span style="color:#66d9ef">R1</span>, [<span style="color:#66d9ef">R1</span>,<span style="color:#75715e">#0x74]
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E60</span>                 <span style="color:#66d9ef">MOV</span>             <span style="color:#66d9ef">R2</span>, <span style="color:#66d9ef">SP</span>
+.text:<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">AD2E62</span>                 <span style="color:#66d9ef">MOV.W</span>           <span style="color:#66d9ef">LR</span>, <span style="color:#75715e">#0xA
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E66</span>                 <span style="color:#66d9ef">STR.W</span>           <span style="color:#66d9ef">LR</span>, [<span style="color:#66d9ef">R2</span>,<span style="color:#75715e">#0xA0+var_A0]
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E6A</span>                 <span style="color:#66d9ef">LDR</span>             <span style="color:#66d9ef">R2</span>, <span style="color:#960050;background-color:#1e0010">=</span>(<span style="color:#66d9ef">aAkukamumemangj</span> - <span style="color:#ae81ff">0xAD2E70</span>)
+.text:<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">AD2E6C</span>                 <span style="color:#66d9ef">ADD</span>             <span style="color:#66d9ef">R2</span>, <span style="color:#66d9ef">PC</span>  <span style="color:#75715e">; &#34;akukamumemangjos&#34;
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E6E</span>                 <span style="color:#66d9ef">LDR.W</span>           <span style="color:#66d9ef">LR</span>, <span style="color:#960050;background-color:#1e0010">=</span>(<span style="color:#66d9ef">aXxteacrypt</span> - <span style="color:#ae81ff">0xAD2E76</span>)
+.text:<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">AD2E72</span>                 <span style="color:#66d9ef">ADD</span>             <span style="color:#66d9ef">LR</span>, <span style="color:#66d9ef">PC</span>  <span style="color:#75715e">; &#34;XXTEACRYPT&#34;
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E74</span>                 <span style="color:#66d9ef">MOVS</span>            <span style="color:#66d9ef">R3</span>, <span style="color:#75715e">#0x10
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E76</span>                 <span style="color:#66d9ef">STR</span>             <span style="color:#66d9ef">R1</span>, [<span style="color:#66d9ef">SP</span>,<span style="color:#75715e">#0xA0+var_68]
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E78</span>                 <span style="color:#66d9ef">MOV</span>             <span style="color:#66d9ef">R1</span>, <span style="color:#66d9ef">R2</span>
+.text:<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">AD2E7A</span>                 <span style="color:#66d9ef">MOV</span>             <span style="color:#66d9ef">R2</span>, <span style="color:#66d9ef">R3</span>
+.text:<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">AD2E7C</span>                 <span style="color:#66d9ef">MOV</span>             <span style="color:#66d9ef">R3</span>, <span style="color:#66d9ef">LR</span>
+.text:<span style="color:#960050;background-color:#1e0010">0</span><span style="color:#960050;background-color:#1e0010">0</span><span style="color:#a6e22e">AD2E7E</span>                 <span style="color:#66d9ef">LDR.W</span>           <span style="color:#66d9ef">LR</span>, [<span style="color:#66d9ef">SP</span>,<span style="color:#75715e">#0xA0+var_68]
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">.text</span>:<span style="color:#ae81ff">00</span><span style="color:#66d9ef">AD2E82</span>                 <span style="color:#66d9ef">BLX</span>             <span style="color:#66d9ef">LR</span>
+<span style="color:#a6e22e">...</span>
+</code></pre></div><p>Terlihat familiar? kurang lebih dalam pseudo-C</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#66d9ef">bool</span> AppDelegate<span style="color:#f92672">:</span><span style="color:#f92672">:</span>applicationDidFinishLaunching(<span style="color:#66d9ef">void</span>)
+...
+stack <span style="color:#f92672">=</span> cocos<span style="color:#f92672">:</span><span style="color:#f92672">:</span>LuaEngine<span style="color:#f92672">:</span><span style="color:#f92672">:</span>getLuaStack();
+<span style="color:#f92672">*</span>(stack <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x74</span>)(this<span style="color:#f92672">?</span><span style="color:#f92672">?</span><span style="color:#f92672">?</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">akukamumemangjos</span><span style="color:#e6db74">&#34;</span>, <span style="color:#ae81ff">0x10</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">XXTEACRYPT</span><span style="color:#e6db74">&#34;</span>, <span style="color:#ae81ff">0xA</span>);
+...
+</code></pre></div><p>yep, key untuk xxtea adalah <code>akukamumemangjos</code>. Langkah terakhir hanya perlu membuat solver untuk dekripsi file luac.</p>
+<h2 id="solver">solver</h2>
+<p>Full solver, implementasi xxtea di cocos2d-x bisa dilihat di <a href="https://github.com/cocos2d/cocos2d-x-samples/blob/9f1472d9083a18853bb1fe97a337292f42abe44a/samples/SwiftTetris/cocos2d/external/xxtea/xxtea.cpp">https://github.com/cocos2d/cocos2d-x-samples/blob/9f1472d9083a18853bb1fe97a337292f42abe44a/samples/SwiftTetris/cocos2d/external/xxtea/xxtea.cpp</a></p>
+<pre><code>#!/usr/bin/env python
+import os
+import argparse
+
+from xxtea import decrypt, encrypt
+
+parser = argparse.ArgumentParser(description='Decrypt/Encrypt XXTEA Block chiper recursively in a folder')
+parser.add_argument(&quot;-d&quot;, &quot;--dir&quot;, help=&quot;Input directory&quot;, required=True)
+parser.add_argument(&quot;-k&quot;, &quot;--key&quot;, help=&quot;Key for decryption&quot;, required=True)
+parser.add_argument(&quot;-s&quot;, &quot;--sign&quot;, help=&quot;File signature&quot;, required=True)
+parser.add_argument(&quot;-o&quot;, &quot;--out&quot;, help=&quot;Output directory&quot;)
+parser.add_argument(&quot;-vv&quot;, &quot;--verbose&quot;, help=&quot;Verbose output&quot;, action=&quot;store_true&quot;)
+args = parser.parse_args()
+
+curdir = args.dir
+
+for file in os.listdir(curdir):
+	curfile = curdir + '/' + file
+	print('\n\n' + curfile + '\n\n')
+	if not os.path.isdir(curfile):
+		fp = open(curfile, 'rb')
+		raw = fp.read()
+		if raw[:len(args.sign)] == args.sign:
+			print(decrypt(raw[len(args.sign):], args.key))
+		else:
+			print('Error!')
+</code></pre><p>Quick run,</p>
+<pre><code>λ › python unluac.py -d assets/src/app/views/ -k akukamumemangjos -s XXTEACRYPT|grep Hack
+       -- local flag = string.format(&quot;FLAG: HackToday{c0mpil3_to_byt3c0de_t0_rem0ve__d3bug_1nf0_1n_c0mment}&quot;)
+</code></pre><h2 id="rants">rants</h2>
+<p>Soal ini sebenernya dari pengalaman lama pribadi, lagi reversing game untuk belajar <del>cheat</del>, eh, ketemu masalah file luac yang terenkripsi. Setelah berhasil dekripsi ternyata beberapa developer game (ini testing hampir ke semua top list di play store yang pakai game engine cocos2d-x lua) masih membiarkan beberapa debug info dan password untuk akses server db game. Baru sadar setelah lomba juga, writeup seperti ini sebenarnya udah pernah ditulis di blog lama, tapi kayanya juga udah hilang entah kemana tersisa hanya tulisan copy-paste dari orang lain.</p>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/hacktoday-2018-faile/"><i class="fa fa-chevron-circle-left"></i> HackToday 2018 - faile</a>
+        </li>
+        
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/noxctf-2018-grocery-list/">noxCTF 2018 - Grocery List <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - kiror0 |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://zeroload.github.io/ctf/index.xml">Subscribe</a></h6>
+    </footer>
+</div>
+<script src="http://zeroload.github.io/ctf/js/scripts.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146594173-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

