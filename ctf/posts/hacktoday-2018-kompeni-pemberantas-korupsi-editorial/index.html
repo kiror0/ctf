@@ -11,13 +11,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
   <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
-  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/css/styles.css" /></head>
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/ctf/css/styles.css" /></head>
 
 <body>
   <div id="container">
     <header>
       <h1>
-                <a href="http://zeroload.github.io/">Catousify</a>
+                <a href="http://zeroload.github.io/ctf/">Catousify</a>
             </h1>
 
       <ul id="social-media">
@@ -37,13 +37,13 @@
     <ul>
         
         <li>
-            <a class="" href="http://zeroload.github.io/posts/">
+            <a class="" href="http://zeroload.github.io/ctf/posts/">
                 <i class="fa-li fa  fa-lg"></i><span>Posts</span>
             </a>
         </li>
         
         <li>
-            <a class="" href="http://zeroload.github.io/about/">
+            <a class="" href="http://zeroload.github.io/ctf/about/">
                 <i class="fa-li fa  fa-lg"></i><span>About Me</span>
             </a>
         </li>
@@ -72,10 +72,10 @@
             <em>
                 
                     
-                    <a href="http://zeroload.github.io/categories/rev">rev</a>
+                    <a href="http://zeroload.github.io/ctf/categories/rev">rev</a>
                 
                     , 
-                    <a href="http://zeroload.github.io/categories/writeup">writeup</a>
+                    <a href="http://zeroload.github.io/ctf/categories/writeup">writeup</a>
                 
             </em>
         </li>
@@ -91,13 +91,13 @@
 
     <blockquote>
 <p>Downloads:</p>
-<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/kpk">kpk</a></p>
-<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/draw_chess.py">draw_chess.py</a></p>
-<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/chess.png">chess.png</a></p>
-<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/chess.png.kpk">chess.png.kpk</a></p>
-<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/flag.png.kpk">flag.png.kpk</a></p>
-<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/flag_recovered.png">flag_recovered.png</a></p>
-<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/solver.py">solver.py</a></p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/kpk/kpk">kpk</a></p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/kpk/draw_chess.py">draw_chess.py</a></p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/kpk/chess.png">chess.png</a></p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/kpk/chess.png.kpk">chess.png.kpk</a></p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/kpk/flag.png.kpk">flag.png.kpk</a></p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/kpk/flag_recovered.png">flag_recovered.png</a></p>
+<p><a href="http://zeroload.github.io/ctf/assets/hacktoday/kpk/solver.py">solver.py</a></p>
 </blockquote>
 <p>Ada beberapa cara yang dapat dilakukan untuk solve problem seperti ini, yang agak lebih mudah yaitu melakukan blackbox dengan fuzzing file input dan check file output yang dihasilkan. Berikut contoh script untuk menghasilkan file input (PNG),</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
@@ -117,7 +117,7 @@ img<span style="color:#f92672">.</span>save(<span style="color:#e6db74"></span><
 00000000  7f 4b 50 4b c8 00 00 00  c8 00 00 00 ff ff ff ff
 00000010  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff
 ... 253 more
-</code></pre><p>Dari hasil tersebut, dapat disimpulkan <code>7f4b504b</code> <code>\x7FKPK</code> adalah file signature dan <code>c8...</code> <code>c8...</code> adalah size <code>(width * height)</code> dari file PNG (0xc8 == 200). Untuk warna dari file PNG, dapat diasumsikan ter-encode dalam <strong>RLE</strong> (info didapat dari hint) tanpa ada pengubahan dalam proses membaca data pixel dari gambar (linear read). Dengan begitu, langkah terakhir hanya dibutuhkan script untuk inflate file menjadi raw pixels dan simpan dalam bentuk gambar berukuran (width, height). <a href="http://zeroload.github.io/assets/hacktoday/kpk/solver.py">Full solver</a>,</p>
+</code></pre><p>Dari hasil tersebut, dapat disimpulkan <code>7f4b504b</code> <code>\x7FKPK</code> adalah file signature dan <code>c8...</code> <code>c8...</code> adalah size <code>(width * height)</code> dari file PNG (0xc8 == 200). Untuk warna dari file PNG, dapat diasumsikan ter-encode dalam <strong>RLE</strong> (info didapat dari hint) tanpa ada pengubahan dalam proses membaca data pixel dari gambar (linear read). Dengan begitu, langkah terakhir hanya dibutuhkan script untuk inflate file menjadi raw pixels dan simpan dalam bentuk gambar berukuran (width, height). <a href="http://zeroload.github.io/ctf/assets/hacktoday/kpk/solver.py">Full solver</a>,</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
 <span style="color:#f92672">from</span> struct <span style="color:#f92672">import</span> unpack
 
@@ -148,7 +148,7 @@ img <span style="color:#f92672">=</span> Image<span style="color:#f92672">.</spa
 img<span style="color:#f92672">.</span>putdata(pixels)
 img<span style="color:#f92672">.</span>save(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">flag_recovered.png</span><span style="color:#e6db74">&#39;</span>)
 </code></pre></div><p>Hasilnya,
-<img src="http://zeroload.github.io/assets/hacktoday/kpk/flag_recovered.png" alt="flag.png"></p>
+<img src="http://zeroload.github.io/ctf/assets/hacktoday/kpk/flag_recovered.png" alt="flag.png"></p>
 
 
 </article>
@@ -158,12 +158,12 @@ img<span style="color:#f92672">.</span>save(<span style="color:#e6db74"></span><
     <ul>
         
         <li>
-            <a href="http://zeroload.github.io/posts/post-event-hacktoday-2018-quals/"><i class="fa fa-chevron-circle-left"></i> Post Event HackToday 2018 Quals</a>
+            <a href="http://zeroload.github.io/ctf/posts/post-event-hacktoday-2018-quals/"><i class="fa fa-chevron-circle-left"></i> Post Event HackToday 2018 Quals</a>
         </li>
         
         
         <li>
-            <a href="http://zeroload.github.io/posts/hacktoday-2018-faile/">HackToday 2018 - faile <i class="fa fa-chevron-circle-right"></i> </a>
+            <a href="http://zeroload.github.io/ctf/posts/hacktoday-2018-faile/">HackToday 2018 - faile <i class="fa fa-chevron-circle-right"></i> </a>
         </li>
         
     </ul>
@@ -178,10 +178,10 @@ img<span style="color:#f92672">.</span>save(<span style="color:#e6db74"></span><
     <footer>
         <h6>Copyright © 2019 - kiror0 |
             Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
-            <a href="http://zeroload.github.io/index.xml">Subscribe</a></h6>
+            <a href="http://zeroload.github.io/ctf/index.xml">Subscribe</a></h6>
     </footer>
 </div>
-<script src="http://zeroload.github.io/js/scripts.js"></script>
+<script src="http://zeroload.github.io/ctf/js/scripts.js"></script>
 
 
 <script type="application/javascript">

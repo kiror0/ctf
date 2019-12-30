@@ -2,22 +2,22 @@
    <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
      <channel>
        <title>web on Catousify</title>
-       <link>http://zeroload.github.io/categories/web/</link>
+       <link>http://zeroload.github.io/ctf/categories/web/</link>
        <description>Recent content in web on Catousify</description>
        <generator>Hugo -- gohugo.io</generator>
        <language>en-us</language>
        <copyright>Copyright &amp;copy; 2019 - kiror0</copyright>
        <lastBuildDate>Sun, 17 Dec 2017 23:06:26 +0000</lastBuildDate>
        
-           <atom:link href="http://zeroload.github.io/categories/web/index.xml" rel="self" type="application/rss+xml" />
+           <atom:link href="http://zeroload.github.io/ctf/categories/web/index.xml" rel="self" type="application/rss+xml" />
        
        
        <item>
          <title>INCTF 2017 - Secure Auth Writeup</title>
-         <link>http://zeroload.github.io/posts/inctf-2017-secure-auth-writeup/</link>
+         <link>http://zeroload.github.io/ctf/posts/inctf-2017-secure-auth-writeup/</link>
          <pubDate>Sun, 17 Dec 2017 23:06:26 +0000</pubDate>
          
-         <guid>http://zeroload.github.io/posts/inctf-2017-secure-auth-writeup/</guid>
+         <guid>http://zeroload.github.io/ctf/posts/inctf-2017-secure-auth-writeup/</guid>
          <description>&lt;blockquote&gt;
 &lt;h2 id=&#34;secure-auth-500-pts&#34;&gt;Secure Auth (500 pts)&lt;/h2&gt;
 &lt;p&gt;&lt;a href=&#34;http://s3cur3auth.inctf.in/&#34;&gt;http://s3cur3auth.inctf.in/&lt;/a&gt;&lt;/p&gt;
@@ -144,7 +144,7 @@ $&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;col
     &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
 &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The next stage, analysis part. (1st) There are 2 input, username in #cuser and password in #cpass. The input is 0x13 bytes long sliced into 5 part and 3-4 bytes each in little endian.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://zeroload.github.io/img/table_1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://zeroload.github.io/ctf/img/table_1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;The authentication uses Unicorn to emulate shellcode in browser.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;var a = new uc[&#39;Unicorn&#39;](uc[&#39;ARCH_X86&#39;], uc[&#39;MODE_32&#39;]);
     var b = 0x8048000;
