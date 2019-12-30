@@ -2,22 +2,22 @@
    <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
      <channel>
        <title>trick on Catousify</title>
-       <link>http://kiror0.github.io/ctf/categories/trick/</link>
+       <link>https://kiror0.github.io/ctf/categories/trick/</link>
        <description>Recent content in trick on Catousify</description>
        <generator>Hugo -- gohugo.io</generator>
        <language>en-us</language>
        <copyright>Copyright &amp;copy; 2019 - kiror0</copyright>
        <lastBuildDate>Thu, 23 Nov 2017 11:48:14 +0000</lastBuildDate>
        
-           <atom:link href="http://kiror0.github.io/ctf/categories/trick/index.xml" rel="self" type="application/rss+xml" />
+           <atom:link href="https://kiror0.github.io/ctf/categories/trick/index.xml" rel="self" type="application/rss+xml" />
        
        
        <item>
          <title>Bypassing Kakao Login Signature Check for Tampered Android Application</title>
-         <link>http://kiror0.github.io/ctf/posts/bypassing-kakao-login-signature-check-for-tampered-android-application/</link>
+         <link>https://kiror0.github.io/ctf/posts/bypassing-kakao-login-signature-check-for-tampered-android-application/</link>
          <pubDate>Thu, 23 Nov 2017 11:48:14 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/bypassing-kakao-login-signature-check-for-tampered-android-application/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/bypassing-kakao-login-signature-check-for-tampered-android-application/</guid>
          <description>&lt;p&gt;I was experiencing something like can&#39;t login with Kakao when the app has been tampered. After going some trials and errors, I&#39;ve found out that it requires Signature hash check for Login in. In &lt;code&gt;com.kakao.util.helper.Utility&lt;/code&gt;&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;static&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;getKeyHash&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Context context&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
     String str &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;

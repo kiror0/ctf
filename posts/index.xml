@@ -2,29 +2,29 @@
    <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
      <channel>
        <title>Posts on Catousify</title>
-       <link>http://kiror0.github.io/ctf/posts/</link>
+       <link>https://kiror0.github.io/ctf/posts/</link>
        <description>Recent content in Posts on Catousify</description>
        <generator>Hugo -- gohugo.io</generator>
        <language>en-us</language>
        <copyright>Copyright &amp;copy; 2019 - kiror0</copyright>
        <lastBuildDate>Mon, 30 Dec 2019 00:00:00 +0000</lastBuildDate>
        
-           <atom:link href="http://kiror0.github.io/ctf/posts/index.xml" rel="self" type="application/rss+xml" />
+           <atom:link href="https://kiror0.github.io/ctf/posts/index.xml" rel="self" type="application/rss+xml" />
        
        
        <item>
          <title>Inferno CTF 2019 - pwn Write Up</title>
-         <link>http://kiror0.github.io/ctf/posts/inferno-ctf-pwn/</link>
+         <link>https://kiror0.github.io/ctf/posts/inferno-ctf-pwn/</link>
          <pubDate>Mon, 30 Dec 2019 00:00:00 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/inferno-ctf-pwn/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/inferno-ctf-pwn/</guid>
          <description>&lt;h2 id=&#34;bookstore&#34;&gt;bookstore&lt;/h2&gt;
 &lt;pre&gt;&lt;code&gt;Description : I&#39;ve been fascinated by the Earthsea Quartet since I was a child, so I would like I opened a bookstore to share Ursula Le Guin&#39;s with y&#39;all. Care to have a look around?
 server: nc 130.211.214.112 18012
 file: bookstore
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;http://kiror0.github.io/ctf/img/inferno/bookstore1.png#mid&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;https://kiror0.github.io/ctf/img/inferno/bookstore1.png#mid&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;I turned ASLR off when debugging, so that I could find address of &lt;code&gt;v5&lt;/code&gt; easily. The only tricky part was finding which input could corrupt &lt;code&gt;v5&lt;/code&gt; without any other function messing with our crafted input. After some debugging session, it turns out &lt;code&gt;puts&lt;/code&gt; mess up the stack too much (&lt;code&gt;puts&lt;/code&gt; is called every loop in main at &lt;code&gt;sub_40178B&lt;/code&gt;).&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://kiror0.github.io/ctf/img/inferno/bookstore2.png#float-right&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://kiror0.github.io/ctf/img/inferno/bookstore2.png#float-right&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;That means, the only way I could forge my pointer is on &lt;code&gt;sub_40122D()&lt;/code&gt; calls right after the menu printed. Luckyly, the buffer to be passed into &lt;code&gt;atoi&lt;/code&gt; is overlapping with &lt;code&gt;v5&lt;/code&gt; later while adding a book to collection.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;TL;DR&lt;/em&gt;, uninitialized variable&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-py&#34; data-lang=&#34;py&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#!/usr/bin/env python&lt;/span&gt;
@@ -109,7 +109,7 @@ gdbscript &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span styl
 &lt;pre&gt;&lt;code&gt;Description: We sell all kinds of treat here, would you care to try our flagship coffee? p.s. It is not only delicious, but also environment friendly.
 server: nc 130.211.214.112 18010
 file: treat
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;http://kiror0.github.io/ctf/img/inferno/treat1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;https://kiror0.github.io/ctf/img/inferno/treat1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;Buffer overflow with a twist, &lt;code&gt;\x00&lt;/code&gt; or &lt;code&gt;\n&lt;/code&gt; as the end of input and the buffer is padded with zeroes to next multiply of 8. &lt;code&gt;\x00&lt;/code&gt; as end of input is limiting us to place input as pointer once at a time since the pointer is 64bit wide and it&#39;ll obviously contains null byte since the pointer isn&#39;t really taking all the 64bit space.
 The trick is you could forge ROP backward instead of the usual &lt;code&gt;p64(poprdi)+p64(binsh)+p64(system)&lt;/code&gt; and placing a pointer once at a time every user input.&lt;/p&gt;
 &lt;p&gt;kinda Visualized,&lt;/p&gt;
@@ -164,7 +164,7 @@ p&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;interactive()
 &lt;pre&gt;&lt;code&gt;Description: A simple AI to greet the customers :chuckles:
 server: nc 130.211.214.112 18016
 file: ld.so, libc.so, helloworld
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;http://kiror0.github.io/ctf/img/inferno/helloworld1.png#float-right&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;img src=&#34;https://kiror0.github.io/ctf/img/inferno/helloworld1.png#float-right&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;2 shot try format string with &lt;code&gt;exit(0)&lt;/code&gt; at the end. Given ld.so and libc.so and if you&#39;ve solved &lt;code&gt;3x17&lt;/code&gt; from &lt;a href=&#34;https://pwnable.tw/&#34;&gt;pwnable.tw&lt;/a&gt;, you should know where this challange will go. Here, there&#39;s another bug that could be used. Did you notice the &lt;code&gt;i&lt;/code&gt; in for loop is signed? You coud change this to some negative number and gain more loop to format string. Then change &lt;code&gt;__free_hook&lt;/code&gt; or &lt;code&gt;__malloc_hook&lt;/code&gt; to &lt;code&gt;one_gadget&lt;/code&gt; and call &lt;code&gt;printf(&amp;quot;%65537c&amp;quot;)&lt;/code&gt; to get &lt;code&gt;malloc&lt;/code&gt;/&lt;code&gt;free&lt;/code&gt; called, &lt;a href=&#34;https://code.woboq.org/userspace/glibc/stdio-common/vfprintf-internal.c.html#1665&#34;&gt;more info about this&lt;/a&gt;.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-py&#34; data-lang=&#34;py&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#!/usr/bin/env python&lt;/span&gt;
 &lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; pwn &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;
@@ -471,17 +471,17 @@ gdbscript &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span styl
        
        <item>
          <title>DEF CON Quals 2019 - Speedrun 12</title>
-         <link>http://kiror0.github.io/ctf/posts/def-con-quals-2019-speedrun-12/</link>
+         <link>https://kiror0.github.io/ctf/posts/def-con-quals-2019-speedrun-12/</link>
          <pubDate>Tue, 14 May 2019 00:53:00 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/def-con-quals-2019-speedrun-12/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/def-con-quals-2019-speedrun-12/</guid>
          <description>&lt;h2 id=&#34;desc&#34;&gt;desc&lt;/h2&gt;
 &lt;p&gt;&lt;a href=&#34;https://gist.github.com/adamdoupe/9fb1fed69421e789a0a623af912e456a&#34;&gt;https://gist.github.com/adamdoupe/9fb1fed69421e789a0a623af912e456a&lt;/a&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Downloads :
-&lt;a href=&#34;http://kiror0.github.io/ctf/ctf/assets/defcon/speedrun-012/speedrun-012&#34;&gt;speedrun-012&lt;/a&gt;
-&lt;a href=&#34;http://kiror0.github.io/ctf/ctf/assets/defcon/speedrun-012/solve.js&#34;&gt;solve.js&lt;/a&gt;
-&lt;a href=&#34;http://kiror0.github.io/ctf/ctf/assets/defcon/speedrun-012/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://kiror0.github.io/ctf/ctf/assets/defcon/speedrun-012/speedrun-012&#34;&gt;speedrun-012&lt;/a&gt;
+&lt;a href=&#34;https://kiror0.github.io/ctf/ctf/assets/defcon/speedrun-012/solve.js&#34;&gt;solve.js&lt;/a&gt;
+&lt;a href=&#34;https://kiror0.github.io/ctf/ctf/assets/defcon/speedrun-012/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;h2 id=&#34;intro&#34;&gt;intro&lt;/h2&gt;
 &lt;p&gt;This article is written by a first timer to experience &amp;ldquo;exploiting&amp;rdquo; &lt;del&gt;real&lt;/del&gt; JS engine. :p&lt;/p&gt;
@@ -648,16 +648,16 @@ OOO{Rule #3: Never `open` the package. Who knows what pwns are lying about?
        
        <item>
          <title>FireShell 2019 - quotes_list</title>
-         <link>http://kiror0.github.io/ctf/posts/fireshell-2019-quotes-list/</link>
+         <link>https://kiror0.github.io/ctf/posts/fireshell-2019-quotes-list/</link>
          <pubDate>Mon, 28 Jan 2019 06:54:42 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/fireshell-2019-quotes-list/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/fireshell-2019-quotes-list/</guid>
          <description>&lt;h2 id=&#34;downloads&#34;&gt;downloads&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/quotes_list/quotes_list.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/quotes_list/libc.so.6&#34;&gt;libc.so.6&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/quotes_list/ld-linux-x86-64.so.2&#34;&gt;ld-linux-x86-64.so.2&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/quotes_list/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/fireshell/quotes_list/quotes_list.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/fireshell/quotes_list/libc.so.6&#34;&gt;libc.so.6&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/fireshell/quotes_list/ld-linux-x86-64.so.2&#34;&gt;ld-linux-x86-64.so.2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/fireshell/quotes_list/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;prep&#34;&gt;prep&lt;/h2&gt;
 &lt;p&gt;You&#39;ll need to patch elf binary to make it run correctly. Using &lt;code&gt;patchelf&lt;/code&gt;,&lt;/p&gt;
@@ -806,15 +806,15 @@ F#{th3r3_ar3_s0m3_n3ws_c0mm1ng_1nt0_libc-2.29}$
        
        <item>
          <title>FireShell 2019 - babyheap</title>
-         <link>http://kiror0.github.io/ctf/posts/fireshell-2019-babyheap/</link>
+         <link>https://kiror0.github.io/ctf/posts/fireshell-2019-babyheap/</link>
          <pubDate>Mon, 28 Jan 2019 06:54:34 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/fireshell-2019-babyheap/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/fireshell-2019-babyheap/</guid>
          <description>&lt;h2 id=&#34;downloads&#34;&gt;downloads&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/babyheap/babyheap.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/babyheap/libc.so.6&#34;&gt;libc.so.6&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/babyheap/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/fireshell/babyheap/babyheap.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/fireshell/babyheap/libc.so.6&#34;&gt;libc.so.6&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/fireshell/babyheap/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;summary&#34;&gt;summary&lt;/h2&gt;
 &lt;ol&gt;
@@ -928,14 +928,14 @@ F#{W3lc0m3_t0_h34p_Expl01t4t10n!}$
        
        <item>
          <title>FireShell 2019 - casino</title>
-         <link>http://kiror0.github.io/ctf/posts/fireshell-2019-casino/</link>
+         <link>https://kiror0.github.io/ctf/posts/fireshell-2019-casino/</link>
          <pubDate>Mon, 28 Jan 2019 06:54:28 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/fireshell-2019-casino/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/fireshell-2019-casino/</guid>
          <description>&lt;h2 id=&#34;download&#34;&gt;download&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/casino/casino.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/casino/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/fireshell/casino/casino.zip&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/fireshell/casino/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;summary&#34;&gt;summary&lt;/h2&gt;
 &lt;ol&gt;
@@ -980,14 +980,14 @@ r&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;interactive()
        
        <item>
          <title>FireShell 2019 - leakless</title>
-         <link>http://kiror0.github.io/ctf/posts/fireshell-2019-leakless/</link>
+         <link>https://kiror0.github.io/ctf/posts/fireshell-2019-leakless/</link>
          <pubDate>Mon, 28 Jan 2019 06:54:21 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/fireshell-2019-leakless/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/fireshell-2019-leakless/</guid>
          <description>&lt;h2 id=&#34;download&#34;&gt;download&lt;/h2&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/leakless/leakless&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/fireshell/leakless/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/fireshell/leakless/leakless&#34;&gt;binary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/fireshell/leakless/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;summary&#34;&gt;summary&lt;/h2&gt;
 &lt;ol&gt;
@@ -1056,19 +1056,19 @@ I guess the intended solution should be using &lt;code&gt;ret2dlresolve&lt;/code
        
        <item>
          <title>Cyber Jawara 2018 Final - zeus</title>
-         <link>http://kiror0.github.io/ctf/posts/cyber-jawara-2018-final-zeus/</link>
+         <link>https://kiror0.github.io/ctf/posts/cyber-jawara-2018-final-zeus/</link>
          <pubDate>Sun, 14 Oct 2018 18:55:10 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/cyber-jawara-2018-final-zeus/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/cyber-jawara-2018-final-zeus/</guid>
          <description>&lt;h2 id=&#34;desc&#34;&gt;desc&lt;/h2&gt;
 &lt;blockquote&gt;
 &lt;p&gt;In-memory key-value database server like Redis and Memcache is widely used for caching in a production server. Can you pwn this key-value database service? You need to reverse engineered it first to know what data structure is used for storing the data. This service is also run with sandbox. For patching, you are only allowed to patch 32 bytes in &amp;lsquo;zeus&amp;rsquo; binary and only 2 bytes in &amp;lsquo;zeus_sandbox&amp;rsquo;. For this service, all attack points are multiplied by 2x.&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Downloads :
-&lt;a href=&#34;http://kiror0.github.io/ctf/assets/cj/zeus/zeus&#34;&gt;zeus&lt;/a&gt;
-&lt;a href=&#34;http://kiror0.github.io/ctf/assets/cj/zeus/libc-2.28-9dc614ec33ee0284064ec5535bda431c.so&#34;&gt;libc-2.28-9dc614ec33ee0284064ec5535bda431c.so&lt;/a&gt;
-&lt;a href=&#34;http://kiror0.github.io/ctf/assets/cj/zeus/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
+&lt;a href=&#34;https://kiror0.github.io/ctf/assets/cj/zeus/zeus&#34;&gt;zeus&lt;/a&gt;
+&lt;a href=&#34;https://kiror0.github.io/ctf/assets/cj/zeus/libc-2.28-9dc614ec33ee0284064ec5535bda431c.so&#34;&gt;libc-2.28-9dc614ec33ee0284064ec5535bda431c.so&lt;/a&gt;
+&lt;a href=&#34;https://kiror0.github.io/ctf/assets/cj/zeus/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;pre&gt;&lt;code&gt;λ › ./zeus
 ...
@@ -1445,14 +1445,14 @@ $
        
        <item>
          <title>noxCTF 2018 - Grocery List</title>
-         <link>http://kiror0.github.io/ctf/posts/noxctf-2018-grocery-list/</link>
+         <link>https://kiror0.github.io/ctf/posts/noxctf-2018-grocery-list/</link>
          <pubDate>Sun, 09 Sep 2018 15:31:34 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/noxctf-2018-grocery-list/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/noxctf-2018-grocery-list/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;Downloads:&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/noxCTF/grocery_list/GroceryList&#34;&gt;GroceryList&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/noxCTF/grocery_list/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/noxCTF/grocery_list/GroceryList&#34;&gt;GroceryList&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/noxCTF/grocery_list/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;h2 id=&#34;intro&#34;&gt;intro&lt;/h2&gt;
 &lt;pre&gt;&lt;code&gt;λ › checksec ./GroceryList
@@ -1767,15 +1767,15 @@ $
        
        <item>
          <title>HackToday 2018 - not /a/game</title>
-         <link>http://kiror0.github.io/ctf/posts/hacktoday-2018-not-a-game/</link>
+         <link>https://kiror0.github.io/ctf/posts/hacktoday-2018-not-a-game/</link>
          <pubDate>Wed, 05 Sep 2018 22:42:44 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/hacktoday-2018-not-a-game/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/hacktoday-2018-not-a-game/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;Downloads:&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/notagame/id.hacktoday.thisis.not.a.game.apk&#34;&gt;id.hacktoday.thisis.not.a.game.apk&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/notagame/unluac.py&#34;&gt;solver.py&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/notagame/xxtea.py&#34;&gt;xxtea.py&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/notagame/id.hacktoday.thisis.not.a.game.apk&#34;&gt;id.hacktoday.thisis.not.a.game.apk&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/notagame/unluac.py&#34;&gt;solver.py&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/notagame/xxtea.py&#34;&gt;xxtea.py&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;pre&gt;&lt;code&gt;cocos2dlua, Kill the Bug
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;intro&#34;&gt;intro&lt;/h2&gt;
@@ -1879,15 +1879,15 @@ for file in os.listdir(curdir):
        
        <item>
          <title>HackToday 2018 - faile</title>
-         <link>http://kiror0.github.io/ctf/posts/hacktoday-2018-faile/</link>
+         <link>https://kiror0.github.io/ctf/posts/hacktoday-2018-faile/</link>
          <pubDate>Mon, 03 Sep 2018 22:16:58 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/hacktoday-2018-faile/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/hacktoday-2018-faile/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;Downloads:&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/faile/faile&#34;&gt;faile&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/faile/libc.so&#34;&gt;libc.so&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/faile/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/faile/faile&#34;&gt;faile&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/faile/libc.so&#34;&gt;libc.so&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/faile/solve.py&#34;&gt;solve.py&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;pre&gt;&lt;code&gt;$ ./faile
 ┏━┳━━┳┳┳━━━━━━━━━━━━━━━━┳━━┳┳┳┓
@@ -2135,19 +2135,19 @@ r&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;interactive()
        
        <item>
          <title>HackToday 2018 - Kompeni Pemberantas Korupsi</title>
-         <link>http://kiror0.github.io/ctf/posts/hacktoday-2018-kompeni-pemberantas-korupsi-editorial/</link>
+         <link>https://kiror0.github.io/ctf/posts/hacktoday-2018-kompeni-pemberantas-korupsi-editorial/</link>
          <pubDate>Sun, 05 Aug 2018 17:52:20 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/hacktoday-2018-kompeni-pemberantas-korupsi-editorial/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/hacktoday-2018-kompeni-pemberantas-korupsi-editorial/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;Downloads:&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/kpk/kpk&#34;&gt;kpk&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/kpk/draw_chess.py&#34;&gt;draw_chess.py&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/kpk/chess.png&#34;&gt;chess.png&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/kpk/chess.png.kpk&#34;&gt;chess.png.kpk&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/kpk/flag.png.kpk&#34;&gt;flag.png.kpk&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/kpk/flag_recovered.png&#34;&gt;flag_recovered.png&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/kpk/solver.py&#34;&gt;solver.py&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/kpk/kpk&#34;&gt;kpk&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/kpk/draw_chess.py&#34;&gt;draw_chess.py&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/kpk/chess.png&#34;&gt;chess.png&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/kpk/chess.png.kpk&#34;&gt;chess.png.kpk&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/kpk/flag.png.kpk&#34;&gt;flag.png.kpk&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/kpk/flag_recovered.png&#34;&gt;flag_recovered.png&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/kpk/solver.py&#34;&gt;solver.py&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;Ada beberapa cara yang dapat dilakukan untuk solve problem seperti ini, yang agak lebih mudah yaitu melakukan blackbox dengan fuzzing file input dan check file output yang dihasilkan. Berikut contoh script untuk menghasilkan file input (PNG),&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; PIL &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; Image
@@ -2167,7 +2167,7 @@ img&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;save(&lt;span style=&
 00000000  7f 4b 50 4b c8 00 00 00  c8 00 00 00 ff ff ff ff
 00000010  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff
 ... 253 more
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Dari hasil tersebut, dapat disimpulkan &lt;code&gt;7f4b504b&lt;/code&gt; &lt;code&gt;\x7FKPK&lt;/code&gt; adalah file signature dan &lt;code&gt;c8...&lt;/code&gt; &lt;code&gt;c8...&lt;/code&gt; adalah size &lt;code&gt;(width * height)&lt;/code&gt; dari file PNG (0xc8 == 200). Untuk warna dari file PNG, dapat diasumsikan ter-encode dalam &lt;strong&gt;RLE&lt;/strong&gt; (info didapat dari hint) tanpa ada pengubahan dalam proses membaca data pixel dari gambar (linear read). Dengan begitu, langkah terakhir hanya dibutuhkan script untuk inflate file menjadi raw pixels dan simpan dalam bentuk gambar berukuran (width, height). &lt;a href=&#34;http://kiror0.github.io/ctf/assets/hacktoday/kpk/solver.py&#34;&gt;Full solver&lt;/a&gt;,&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Dari hasil tersebut, dapat disimpulkan &lt;code&gt;7f4b504b&lt;/code&gt; &lt;code&gt;\x7FKPK&lt;/code&gt; adalah file signature dan &lt;code&gt;c8...&lt;/code&gt; &lt;code&gt;c8...&lt;/code&gt; adalah size &lt;code&gt;(width * height)&lt;/code&gt; dari file PNG (0xc8 == 200). Untuk warna dari file PNG, dapat diasumsikan ter-encode dalam &lt;strong&gt;RLE&lt;/strong&gt; (info didapat dari hint) tanpa ada pengubahan dalam proses membaca data pixel dari gambar (linear read). Dengan begitu, langkah terakhir hanya dibutuhkan script untuk inflate file menjadi raw pixels dan simpan dalam bentuk gambar berukuran (width, height). &lt;a href=&#34;https://kiror0.github.io/ctf/assets/hacktoday/kpk/solver.py&#34;&gt;Full solver&lt;/a&gt;,&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; PIL &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; Image
 &lt;span style=&#34;color:#f92672&#34;&gt;from&lt;/span&gt; struct &lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; unpack
 
@@ -2198,16 +2198,16 @@ img &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; Image&lt;span style
 img&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;putdata(pixels)
 img&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;save(&lt;span style=&#34;color:#e6db74&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;flag_recovered.png&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;&lt;/span&gt;)
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Hasilnya,
-&lt;img src=&#34;http://kiror0.github.io/ctf/assets/hacktoday/kpk/flag_recovered.png&#34; alt=&#34;flag.png&#34;&gt;&lt;/p&gt;
+&lt;img src=&#34;https://kiror0.github.io/ctf/assets/hacktoday/kpk/flag_recovered.png&#34; alt=&#34;flag.png&#34;&gt;&lt;/p&gt;
 </description>
        </item>
        
        <item>
          <title>Post Event HackToday 2018 Quals</title>
-         <link>http://kiror0.github.io/ctf/posts/post-event-hacktoday-2018-quals/</link>
+         <link>https://kiror0.github.io/ctf/posts/post-event-hacktoday-2018-quals/</link>
          <pubDate>Sat, 04 Aug 2018 19:06:10 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/post-event-hacktoday-2018-quals/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/post-event-hacktoday-2018-quals/</guid>
          <description>&lt;p&gt;Dibalik semua keajaiban untuk pertama kali jadi &lt;em&gt;Ngadimin&lt;/em&gt; di event CTF, yang
 paling seru adalah momen soal yang dibuat sendiri ada yang solve oleh peserta
 tanpa ada masalah. Sayangnya, 3 soal yang dibuat cuma 1 yang sempat disolve
@@ -2233,10 +2233,10 @@ ditunggu kedatangan para finalis di Bogor saat final nanti. yeay.&lt;/p&gt;
        
        <item>
          <title>SlashRoot 2018 - SNOW LAN(D)</title>
-         <link>http://kiror0.github.io/ctf/posts/slashroot-2018-snow-lan-d/</link>
+         <link>https://kiror0.github.io/ctf/posts/slashroot-2018-snow-lan-d/</link>
          <pubDate>Sat, 28 Jul 2018 22:29:20 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/slashroot-2018-snow-lan-d/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/slashroot-2018-snow-lan-d/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;Download : &lt;a href=&#34;&#34;&gt;SNOW LAN(D).apk&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -2335,18 +2335,18 @@ ditunggu kedatangan para finalis di Bogor saat final nanti. yeay.&lt;/p&gt;
        
        <item>
          <title>CTFZone 2018 Quals - android_ololo_country_checker</title>
-         <link>http://kiror0.github.io/ctf/posts/ctfzone-2018-quals-android-ololo-country-checker/</link>
+         <link>https://kiror0.github.io/ctf/posts/ctfzone-2018-quals-android-ololo-country-checker/</link>
          <pubDate>Mon, 23 Jul 2018 08:21:09 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/ctfzone-2018-quals-android-ololo-country-checker/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/ctfzone-2018-quals-android-ololo-country-checker/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;It&#39;s a foreign android application. Let&#39;s try to guess the country!
 &lt;!-- raw HTML omitted --&gt;Solves : 9
 &lt;!-- raw HTML omitted --&gt;Point : 314. (Dynamic Score)
 &lt;!-- raw HTML omitted --&gt;Download :
 &lt;!-- raw HTML omitted --&gt;- &lt;a href=&#34;https://ctf.bi.zone/files/ololo.8ed245a0a90f801ebf8ccf0676564ff1&#34;&gt;ololo.8ed245a0a90f801ebf8ccf0676564ff1&lt;/a&gt;
-&lt;!-- raw HTML omitted --&gt;- &lt;a href=&#34;http://kiror0.github.io/ctf/img/ctfzone2018/native-lib.c&#34;&gt;native-lib.c&lt;/a&gt;
-&lt;!-- raw HTML omitted --&gt;- &lt;a href=&#34;http://kiror0.github.io/ctf/img/ctfzone2018/MainActivity.java&#34;&gt;MainActivity.java&lt;/a&gt;&lt;/p&gt;
+&lt;!-- raw HTML omitted --&gt;- &lt;a href=&#34;https://kiror0.github.io/ctf/img/ctfzone2018/native-lib.c&#34;&gt;native-lib.c&lt;/a&gt;
+&lt;!-- raw HTML omitted --&gt;- &lt;a href=&#34;https://kiror0.github.io/ctf/img/ctfzone2018/MainActivity.java&#34;&gt;MainActivity.java&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sh&#34; data-lang=&#34;sh&#34;&gt;λ › file ololo.8ed245a0a90f801ebf8ccf0676564ff1
 ololo.8ed245a0a90f801ebf8ccf0676564ff1: Zip archive data, at least v?&lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;0&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt; to extract
@@ -2488,8 +2488,8 @@ package_name = ololo.ololo.ololo(5b4802bc02112666dabafe0c77ac18d0)
     });
 });
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Run the app, attach frida with the script above, boom, got the flag,&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://kiror0.github.io/ctf/img/ctfzone2018/ololo1.png&#34; alt=&#34;&#34;&gt;
-&lt;img src=&#34;http://kiror0.github.io/ctf/img/ctfzone2018/ololo2.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://kiror0.github.io/ctf/img/ctfzone2018/ololo1.png&#34; alt=&#34;&#34;&gt;
+&lt;img src=&#34;https://kiror0.github.io/ctf/img/ctfzone2018/ololo2.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;!-- raw HTML omitted --&gt;
 &lt;hr&gt;
 &lt;p&gt;Some notes and failed attack ideas. The first approach was static analysis and rewrite all of important function in C to decrypt raw data. The result? It fails miserably, it took me 1 hour to get to know frida and the flag, while rewrite took me 8 hours (8 hours of coding, mostly contemplating and asking what the fck am I doing for of not getting any progress. sad.) While the first reverse engineer part (decompile, analysis, and stuff) took me 1-2 hours. Yep, better to get another unique ideas if you are stuck for a long time. &lt;del&gt;but how? idk. sad.&lt;/del&gt;&lt;/p&gt;
@@ -2498,10 +2498,10 @@ package_name = ololo.ololo.ololo(5b4802bc02112666dabafe0c77ac18d0)
        
        <item>
          <title>Security Fest CTF 2018 - bluepill</title>
-         <link>http://kiror0.github.io/ctf/posts/security-fest-ctf-2018-bluepill/</link>
+         <link>https://kiror0.github.io/ctf/posts/security-fest-ctf-2018-bluepill/</link>
          <pubDate>Sat, 02 Jun 2018 00:00:00 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/security-fest-ctf-2018-bluepill/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/security-fest-ctf-2018-bluepill/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;This your last chance. After this there is no turning back. You take the blue pill, the story ends. You wake up in your bed and believe whatever you want to. You take the red pill, you stay in Wonderland, and I show you how deep the rabbit hole goes. Remember, all I&#39;m offering is the truth. Nothing more. This challenge was sponsored by ATEA! If you are a local student player you are eligible to turn in the flag at the ATEA booth for a prize!&lt;/p&gt;
 &lt;p&gt;Solves: 27&lt;/p&gt;
@@ -2716,10 +2716,10 @@ c05e2754376ae75499b5170314a6e54c MD5 : r3D1
        
        <item>
          <title>Security Fest CTF 2018 - sshnuke</title>
-         <link>http://kiror0.github.io/ctf/posts/security-fest-ctf-2018-sshnuke/</link>
+         <link>https://kiror0.github.io/ctf/posts/security-fest-ctf-2018-sshnuke/</link>
          <pubDate>Sat, 02 Jun 2018 00:00:00 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/security-fest-ctf-2018-sshnuke/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/security-fest-ctf-2018-sshnuke/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;Security Fest CTF 2018 - sshnuke&lt;/p&gt;
 &lt;p&gt;&lt;a href=&#34;https://nmap.org/movies/matrix/matrix-nmap.mp4&#34;&gt;https://nmap.org/movies/matrix/matrix-nmap.mp4&lt;/a&gt; . The flag is in /home/ctf/flag.&lt;/p&gt;
@@ -2943,10 +2943,10 @@ $
        
        <item>
          <title>JOINTS 2018 - Simple VM WriteUp</title>
-         <link>http://kiror0.github.io/ctf/posts/simple-vm-joints-2018-writeup/</link>
+         <link>https://kiror0.github.io/ctf/posts/simple-vm-joints-2018-writeup/</link>
          <pubDate>Mon, 07 May 2018 18:14:01 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/simple-vm-joints-2018-writeup/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/simple-vm-joints-2018-writeup/</guid>
          <description>&lt;p&gt;&lt;em&gt;psst: Post ini akan banyak sisipan rant dan commentary saat sesi Final JOINTS 2018.&lt;/em&gt; Hasil decompile binary ELF di IDA pro agak cukup berantakan, Jadi, saya buka di graph view untuk analisa opcode. Hasilnya, agak terhambat di bagian byte 0xD1 - 0xD5. Tapi, akhirnya source code soal dibagikan saat menjelang akhir lomba. btw, kalau bisa ada hint yang di keluarkan tolong diumumkan langusng, ehe. cc: panitia Source code soal &lt;em&gt;redacted&lt;/em&gt;,&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-C&#34; data-lang=&#34;C&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
 &lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;#&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;include&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;stdlib.h&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;
@@ -3303,10 +3303,10 @@ Password Benar
        
        <item>
          <title>SharifCTF 2018 - fHash Writeup</title>
-         <link>http://kiror0.github.io/ctf/posts/sharifctf-2018-fhash-writeup/</link>
+         <link>https://kiror0.github.io/ctf/posts/sharifctf-2018-fhash-writeup/</link>
          <pubDate>Sun, 04 Feb 2018 16:16:15 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/sharifctf-2018-fhash-writeup/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/sharifctf-2018-fhash-writeup/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;fHash.py (&lt;a href=&#34;https://pastebin.com/tEw7BPtX&#34;&gt;https://pastebin.com/tEw7BPtX&lt;/a&gt;)&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -3367,10 +3367,10 @@ The final answer, &lt;code&gt;hl2 = 45ED&lt;/code&gt;, &lt;code&gt;hr2 = E19F&lt
        
        <item>
          <title>INCTF 2017 - Secure Auth Writeup</title>
-         <link>http://kiror0.github.io/ctf/posts/inctf-2017-secure-auth-writeup/</link>
+         <link>https://kiror0.github.io/ctf/posts/inctf-2017-secure-auth-writeup/</link>
          <pubDate>Sun, 17 Dec 2017 23:06:26 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/inctf-2017-secure-auth-writeup/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/inctf-2017-secure-auth-writeup/</guid>
          <description>&lt;blockquote&gt;
 &lt;h2 id=&#34;secure-auth-500-pts&#34;&gt;Secure Auth (500 pts)&lt;/h2&gt;
 &lt;p&gt;&lt;a href=&#34;http://s3cur3auth.inctf.in/&#34;&gt;http://s3cur3auth.inctf.in/&lt;/a&gt;&lt;/p&gt;
@@ -3497,7 +3497,7 @@ $&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;col
     &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
 &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;The next stage, analysis part. (1st) There are 2 input, username in #cuser and password in #cpass. The input is 0x13 bytes long sliced into 5 part and 3-4 bytes each in little endian.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&#34;http://kiror0.github.io/ctf/img/table_1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://kiror0.github.io/ctf/img/table_1.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;The authentication uses Unicorn to emulate shellcode in browser.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;var a = new uc[&#39;Unicorn&#39;](uc[&#39;ARCH_X86&#39;], uc[&#39;MODE_32&#39;]);
     var b = 0x8048000;
@@ -3600,10 +3600,10 @@ l =&amp;gt; EBP
        
        <item>
          <title>IDSECCONF 2017 Online - Darwin Writeup</title>
-         <link>http://kiror0.github.io/ctf/posts/idsecconf-2017-online-darwin-writeup/</link>
+         <link>https://kiror0.github.io/ctf/posts/idsecconf-2017-online-darwin-writeup/</link>
          <pubDate>Tue, 12 Dec 2017 20:02:30 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/idsecconf-2017-online-darwin-writeup/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/idsecconf-2017-online-darwin-writeup/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;Darwin (??? pts) &lt;a href=&#34;https://a.safe.moe/Ph9RJ.zip&#34;&gt;Download&lt;/a&gt; Reverse Engineering Mach-O executable&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -3805,10 +3805,10 @@ s&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;add(v3 &lt;span style=&
        
        <item>
          <title>SECCON 2017 - Powerful_Shell Writeup</title>
-         <link>http://kiror0.github.io/ctf/posts/seccon-2017-powerful-shell-writeup/</link>
+         <link>https://kiror0.github.io/ctf/posts/seccon-2017-powerful-shell-writeup/</link>
          <pubDate>Mon, 11 Dec 2017 10:27:58 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/seccon-2017-powerful-shell-writeup/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/seccon-2017-powerful-shell-writeup/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;Powerful_Shell 300 points Powerful_Shell Crack me. powerful_shell.ps1-1fb3af91eafdbebf3b3efa3b84fcc10cfca21ab53db15c98797b500c739b0024 &lt;a href=&#34;https://a.safe.moe/fmq8i.ps1-1fb3af91eafdbebf3b3efa3b84fcc10cfca21ab53db15c98797b500c739b0024&#34;&gt;Download&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -4130,10 +4130,10 @@ If($ECCON -eq &#39;P0wEr$H311&#39;){
        
        <item>
          <title>TPCTF 2017 - Bad Encryption Writeup</title>
-         <link>http://kiror0.github.io/ctf/posts/tpctf-2017-bad-encryption-writeup/</link>
+         <link>https://kiror0.github.io/ctf/posts/tpctf-2017-bad-encryption-writeup/</link>
          <pubDate>Thu, 07 Dec 2017 12:30:54 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/tpctf-2017-bad-encryption-writeup/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/tpctf-2017-bad-encryption-writeup/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;I was making an encryption program, but it is far from perfect. Instead of make the encryption work, I decided to just encrypt everything 100 times. Hint : I bet the encryption works at least most of the time.&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -4221,10 +4221,10 @@ freq &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; [[&lt;span style=&
        
        <item>
          <title>TUCTF 2017 - Reverse Engineering Writeup</title>
-         <link>http://kiror0.github.io/ctf/posts/tuctf-2017-reverse-engineering-writeup/</link>
+         <link>https://kiror0.github.io/ctf/posts/tuctf-2017-reverse-engineering-writeup/</link>
          <pubDate>Mon, 27 Nov 2017 18:01:11 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/tuctf-2017-reverse-engineering-writeup/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/tuctf-2017-reverse-engineering-writeup/</guid>
          <description>&lt;h1 id=&#34;funmail&#34;&gt;Funmail&lt;/h1&gt;
 &lt;blockquote&gt;
 &lt;p&gt;One of our employees has locked himself out of his account. can you help &amp;lsquo;john galt&amp;rsquo; recover his password? And no snooping around his emails you hear.&lt;/p&gt;
@@ -4552,10 +4552,10 @@ s&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;add(str[&lt;span style=
        
        <item>
          <title>AgriHack 0x2 - Lift Rektorat Writeup</title>
-         <link>http://kiror0.github.io/ctf/posts/agrihack-0x2-lift-rektorat-writeup/</link>
+         <link>https://kiror0.github.io/ctf/posts/agrihack-0x2-lift-rektorat-writeup/</link>
          <pubDate>Fri, 24 Nov 2017 00:38:01 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/agrihack-0x2-lift-rektorat-writeup/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/agrihack-0x2-lift-rektorat-writeup/</guid>
          <description>&lt;blockquote&gt;
 &lt;p&gt;&lt;em&gt;&lt;strong&gt;Lift Rektorat (300 pts)&lt;/strong&gt;&lt;/em&gt; Kamu sedang berada direktorat karena kamu hendak menemui rektor karena kamu ditunjuk menjadi kepala keamanan cyber di IPB. Tiba-tiba terjadi sebuah insiden yang membuat kamu tersadar, bahwa bahkan lift rektorat memiliki celah untuk dieksploitasi. Tunjukkan bagaimana kamu mengeksploitasi celah tersebut. &amp;ndash; binary &amp;ndash;&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -4728,10 +4728,10 @@ vagrant
        
        <item>
          <title>Bypassing Kakao Login Signature Check for Tampered Android Application</title>
-         <link>http://kiror0.github.io/ctf/posts/bypassing-kakao-login-signature-check-for-tampered-android-application/</link>
+         <link>https://kiror0.github.io/ctf/posts/bypassing-kakao-login-signature-check-for-tampered-android-application/</link>
          <pubDate>Thu, 23 Nov 2017 11:48:14 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/bypassing-kakao-login-signature-check-for-tampered-android-application/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/bypassing-kakao-login-signature-check-for-tampered-android-application/</guid>
          <description>&lt;p&gt;I was experiencing something like can&#39;t login with Kakao when the app has been tampered. After going some trials and errors, I&#39;ve found out that it requires Signature hash check for Login in. In &lt;code&gt;com.kakao.util.helper.Utility&lt;/code&gt;&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;static&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;getKeyHash&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Context context&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
     String str &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
@@ -4779,10 +4779,10 @@ vagrant
        
        <item>
          <title>The Revival</title>
-         <link>http://kiror0.github.io/ctf/posts/the-revival/</link>
+         <link>https://kiror0.github.io/ctf/posts/the-revival/</link>
          <pubDate>Mon, 10 Jul 2017 14:40:13 +0000</pubDate>
          
-         <guid>http://kiror0.github.io/ctf/posts/the-revival/</guid>
+         <guid>https://kiror0.github.io/ctf/posts/the-revival/</guid>
          <description>&lt;p&gt;YES. KITTENS. I don&#39;t like cats, but I&#39;ll &lt;em&gt;try&lt;/em&gt; to write around to fl00d this blog. Thus, this is a warm welcome from Cats.&lt;/p&gt;
 &lt;p&gt;😻😹😸🙀🙀😹😹😸🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😹😼😽🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😹😽😼🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😹😽😼🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😹😽😿🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😽😼🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😼😸🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😹😺😿🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😹😽😿🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😹😾😺🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😹😽😼🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😹😼😼🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😼😹🙀🙀😽😼😸🙀🙀😻😹😸🙀🙀😹😺🙀🙀😽😼😸🙀🙀🙀🙀&lt;/p&gt;
 </description>

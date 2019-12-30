@@ -11,13 +11,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
   <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
-  <link rel="stylesheet" type="text/css" href="http://kiror0.github.io/ctf/css/styles.css" /></head>
+  <link rel="stylesheet" type="text/css" href="https://kiror0.github.io/ctf/css/styles.css" /></head>
 
 <body>
   <div id="container">
     <header>
       <h1>
-                <a href="http://kiror0.github.io/ctf/">Catousify</a>
+                <a href="https://kiror0.github.io/ctf/">Catousify</a>
             </h1>
 
       <ul id="social-media">
@@ -37,13 +37,13 @@
     <ul>
         
         <li>
-            <a class="" href="http://kiror0.github.io/ctf/posts/">
+            <a class="" href="https://kiror0.github.io/ctf/posts/">
                 <i class="fa-li fa  fa-lg"></i><span>Posts</span>
             </a>
         </li>
         
         <li>
-            <a class="" href="http://kiror0.github.io/ctf/about/">
+            <a class="" href="https://kiror0.github.io/ctf/about/">
                 <i class="fa-li fa  fa-lg"></i><span>About Me</span>
             </a>
         </li>
@@ -72,10 +72,10 @@
             <em>
                 
                     
-                    <a href="http://kiror0.github.io/ctf/categories/rev">rev</a>
+                    <a href="https://kiror0.github.io/ctf/categories/rev">rev</a>
                 
                     , 
-                    <a href="http://kiror0.github.io/ctf/categories/writeup">writeup</a>
+                    <a href="https://kiror0.github.io/ctf/categories/writeup">writeup</a>
                 
             </em>
         </li>
@@ -93,9 +93,9 @@
 <pre><code>Description : I've been fascinated by the Earthsea Quartet since I was a child, so I would like I opened a bookstore to share Ursula Le Guin's with y'all. Care to have a look around?
 server: nc 130.211.214.112 18012
 file: bookstore
-</code></pre><p><img src="http://kiror0.github.io/ctf/img/inferno/bookstore1.png#mid" alt=""></p>
+</code></pre><p><img src="https://kiror0.github.io/ctf/img/inferno/bookstore1.png#mid" alt=""></p>
 <p>I turned ASLR off when debugging, so that I could find address of <code>v5</code> easily. The only tricky part was finding which input could corrupt <code>v5</code> without any other function messing with our crafted input. After some debugging session, it turns out <code>puts</code> mess up the stack too much (<code>puts</code> is called every loop in main at <code>sub_40178B</code>).</p>
-<p><img src="http://kiror0.github.io/ctf/img/inferno/bookstore2.png#float-right" alt=""></p>
+<p><img src="https://kiror0.github.io/ctf/img/inferno/bookstore2.png#float-right" alt=""></p>
 <p>That means, the only way I could forge my pointer is on <code>sub_40122D()</code> calls right after the menu printed. Luckyly, the buffer to be passed into <code>atoi</code> is overlapping with <code>v5</code> later while adding a book to collection.</p>
 <p><em>TL;DR</em>, uninitialized variable</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e">#!/usr/bin/env python</span>
@@ -180,7 +180,7 @@ gdbscript <span style="color:#f92672">=</span> <span style="color:#e6db74"></spa
 <pre><code>Description: We sell all kinds of treat here, would you care to try our flagship coffee? p.s. It is not only delicious, but also environment friendly.
 server: nc 130.211.214.112 18010
 file: treat
-</code></pre><p><img src="http://kiror0.github.io/ctf/img/inferno/treat1.png" alt=""></p>
+</code></pre><p><img src="https://kiror0.github.io/ctf/img/inferno/treat1.png" alt=""></p>
 <p>Buffer overflow with a twist, <code>\x00</code> or <code>\n</code> as the end of input and the buffer is padded with zeroes to next multiply of 8. <code>\x00</code> as end of input is limiting us to place input as pointer once at a time since the pointer is 64bit wide and it'll obviously contains null byte since the pointer isn't really taking all the 64bit space.
 The trick is you could forge ROP backward instead of the usual <code>p64(poprdi)+p64(binsh)+p64(system)</code> and placing a pointer once at a time every user input.</p>
 <p>kinda Visualized,</p>
@@ -235,7 +235,7 @@ p<span style="color:#f92672">.</span>interactive()
 <pre><code>Description: A simple AI to greet the customers :chuckles:
 server: nc 130.211.214.112 18016
 file: ld.so, libc.so, helloworld
-</code></pre><p><img src="http://kiror0.github.io/ctf/img/inferno/helloworld1.png#float-right" alt=""></p>
+</code></pre><p><img src="https://kiror0.github.io/ctf/img/inferno/helloworld1.png#float-right" alt=""></p>
 <p>2 shot try format string with <code>exit(0)</code> at the end. Given ld.so and libc.so and if you've solved <code>3x17</code> from <a href="https://pwnable.tw/">pwnable.tw</a>, you should know where this challange will go. Here, there's another bug that could be used. Did you notice the <code>i</code> in for loop is signed? You coud change this to some negative number and gain more loop to format string. Then change <code>__free_hook</code> or <code>__malloc_hook</code> to <code>one_gadget</code> and call <code>printf(&quot;%65537c&quot;)</code> to get <code>malloc</code>/<code>free</code> called, <a href="https://code.woboq.org/userspace/glibc/stdio-common/vfprintf-internal.c.html#1665">more info about this</a>.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e">#!/usr/bin/env python</span>
 <span style="color:#f92672">from</span> pwn <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
@@ -546,7 +546,7 @@ gdbscript <span style="color:#f92672">=</span> <span style="color:#e6db74"></spa
     <ul>
         
         <li>
-            <a href="http://kiror0.github.io/ctf/posts/def-con-quals-2019-speedrun-12/"><i class="fa fa-chevron-circle-left"></i> DEF CON Quals 2019 - Speedrun 12</a>
+            <a href="https://kiror0.github.io/ctf/posts/def-con-quals-2019-speedrun-12/"><i class="fa fa-chevron-circle-left"></i> DEF CON Quals 2019 - Speedrun 12</a>
         </li>
         
         
@@ -562,10 +562,10 @@ gdbscript <span style="color:#f92672">=</span> <span style="color:#e6db74"></spa
     <footer>
         <h6>Copyright © 2019 - kiror0 |
             Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
-            <a href="http://kiror0.github.io/ctf/index.xml">Subscribe</a></h6>
+            <a href="https://kiror0.github.io/ctf/index.xml">Subscribe</a></h6>
     </footer>
 </div>
-<script src="http://kiror0.github.io/ctf/js/scripts.js"></script>
+<script src="https://kiror0.github.io/ctf/js/scripts.js"></script>
 
 
 <script type="application/javascript">
