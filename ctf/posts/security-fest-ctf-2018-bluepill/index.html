@@ -1,0 +1,350 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Catousify</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The HTML5 Herald" />
+  <meta name="author" content="kiror0" /><meta name="generator" content="Hugo 0.62.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
+  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="http://zeroload.github.io/">Catousify</a>
+            </h1>
+
+      <ul id="social-media">
+        
+        
+          
+        <li><a href="https://github.com/kiror0"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
+           
+      </ul>
+      
+      <p><em>No Clever Tagline Needed.</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/about/">
+                <i class="fa-li fa  fa-lg"></i><span>About Me</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>Security Fest CTF 2018 - bluepill</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2018-06-02T00:00:00Z">Jun 2, 2018</time>
+        </li>
+        
+        <li>
+            Categories:
+            <em>
+                
+                    
+                    <a href="http://zeroload.github.io/categories/rev">rev</a>
+                
+                    , 
+                    <a href="http://zeroload.github.io/categories/writeup">writeup</a>
+                
+            </em>
+        </li>
+        
+
+        
+
+        <li>5 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <blockquote>
+<p>This your last chance. After this there is no turning back. You take the blue pill, the story ends. You wake up in your bed and believe whatever you want to. You take the red pill, you stay in Wonderland, and I show you how deep the rabbit hole goes. Remember, all I'm offering is the truth. Nothing more. This challenge was sponsored by ATEA! If you are a local student player you are eligible to turn in the flag at the ATEA booth for a prize!</p>
+<p>Solves: 27</p>
+<p>Service: nc rev.trinity.neo.ctf.rocks 31337 or nc 209.97.136.62 31337</p>
+<p>Download: bluepill.tar.gz</p>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ tar xvf bluepill.tar.gz
+bluepill.ko
+init
+run.sh
+tiny.kernel
+$ file bluepill.ko
+bluepill.ko: ELF 64-bit LSB relocatable, x86-64, version <span style="color:#ae81ff">1</span> <span style="color:#f92672">(</span>SYSV<span style="color:#f92672">)</span>, BuildID<span style="color:#f92672">[</span>sha1<span style="color:#f92672">]</span><span style="color:#f92672">=</span>3e46a2d1b5659bcf7947bb4ec5c11d2226289df1, not stripped
+$ cat run.sh
+<span style="color:#75715e">#! /usr/bin/env bash</span>
+
+qemu-system-x86_64 -kernel ./tiny.kernel -initrd ./init -m <span style="color:#ae81ff">32</span> -nographic -append <span style="color:#e6db74">&#34;console=ttyS0&#34;</span>
+</code></pre></div><p>An unique one i guess, it's rare to see a kernel problem on reversing category but the goal is clear, we have to reverse engineer the kernel module.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">int</span> <span style="color:#66d9ef">__cdecl</span> <span style="color:#a6e22e">bluepill_init</span>()
+{
+  <span style="color:#66d9ef">signed</span> <span style="color:#66d9ef">__int64</span> v0; <span style="color:#75715e">// rcx
+</span><span style="color:#75715e"></span>  file_operations <span style="color:#f92672">*</span>v1; <span style="color:#75715e">// rdi
+</span><span style="color:#75715e"></span>
+  printk(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x016</span><span style="color:#e6db74">[BLUEPILL] Loaded ...</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+  v0 <span style="color:#f92672">=</span> <span style="color:#ae81ff">62LL</span>;
+  v1 <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>fops_35702;
+  <span style="color:#66d9ef">while</span> ( v0 )
+  {
+    LODWORD(v1<span style="color:#f92672">-</span><span style="color:#f92672">&gt;</span>owner) <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    v1 <span style="color:#f92672">=</span> (file_operations <span style="color:#f92672">*</span>)((<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>)v1 <span style="color:#f92672">+</span> <span style="color:#ae81ff">4</span>);
+    <span style="color:#f92672">-</span><span style="color:#f92672">-</span>v0;
+  }
+  fops_35702.write <span style="color:#f92672">=</span> (ssize_t (<span style="color:#f92672">*</span>)(file <span style="color:#f92672">*</span>, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>, size_t, loff_t <span style="color:#f92672">*</span>))pill_choice;
+  proc_create(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">bluepill</span><span style="color:#e6db74">&#34;</span>, <span style="color:#ae81ff">0666LL</span>, <span style="color:#ae81ff">0LL</span>, <span style="color:#f92672">&amp;</span>fops_35702);
+  <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>So, kernel module create a rw (0666) proc at <code>/proc/bluepill</code>, with <code>write</code> routine at <code>pill_choice</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">size_t <span style="color:#66d9ef">__fastcall</span> <span style="color:#a6e22e">pill_choice</span>(file <span style="color:#f92672">*</span>sp_file, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>buf, size_t size, loff_t <span style="color:#f92672">*</span>offset)
+{
+  size_t v4; <span style="color:#75715e">// r12
+</span><span style="color:#75715e"></span>  file <span style="color:#f92672">*</span>v5; <span style="color:#75715e">// rax
+</span><span style="color:#75715e"></span>  file <span style="color:#f92672">*</span>v6; <span style="color:#75715e">// rbx
+</span><span style="color:#75715e"></span>  file <span style="color:#f92672">*</span>v7; <span style="color:#75715e">// rdi
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int8</span> <span style="color:#f92672">*</span>v8; <span style="color:#75715e">// rbx
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>v9; <span style="color:#75715e">// r13
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">__int64</span> v10; <span style="color:#75715e">// rbp
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> v11; <span style="color:#75715e">// eax
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> v12; <span style="color:#75715e">// edx
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">signed</span> <span style="color:#66d9ef">__int64</span> v13; <span style="color:#75715e">// rdi
+</span><span style="color:#75715e"></span>  _QWORD <span style="color:#f92672">*</span>v14; <span style="color:#75715e">// rcx
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">__int64</span> v15; <span style="color:#75715e">// rax
+</span><span style="color:#75715e"></span>  _QWORD <span style="color:#f92672">*</span>i; <span style="color:#75715e">// rdx
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int8</span> digest[<span style="color:#ae81ff">8</span>]; <span style="color:#75715e">// [rsp+7h] [rbp-59h]
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">__int64</span> v19; <span style="color:#75715e">// [rsp+Fh] [rbp-51h]
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">__int64</span> s2; <span style="color:#75715e">// [rsp+17h] [rbp-49h]
+</span><span style="color:#75715e"></span>  <span style="color:#66d9ef">char</span> v21; <span style="color:#75715e">// [rsp+1Fh] [rbp-41h]
+</span><span style="color:#75715e"></span>
+  v4 <span style="color:#f92672">=</span> strncpy_from_user(<span style="color:#f92672">&amp;</span>user_input, buf, <span style="color:#ae81ff">20LL</span>, offset);
+  v5 <span style="color:#f92672">=</span> file_open(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">/proc/version</span><span style="color:#e6db74">&#34;</span>);
+  <span style="color:#66d9ef">if</span> ( v5 )
+  {
+    v6 <span style="color:#f92672">=</span> v5;
+    file_read(v5, (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int8</span> <span style="color:#f92672">*</span>)magic, <span style="color:#ae81ff">0x1F4u</span>);
+    v7 <span style="color:#f92672">=</span> v6;
+    v8 <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>user_input;
+    filp_close(v7, <span style="color:#ae81ff">0LL</span>);
+    <span style="color:#66d9ef">if</span> ( strlen((<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>user_input) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0xB</span> )
+    {
+      v9 <span style="color:#f92672">=</span> const_bss;
+      <span style="color:#66d9ef">while</span> ( <span style="color:#ae81ff">1</span> )
+      {
+        v10 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0LL</span>;
+        memset(<span style="color:#f92672">&amp;</span>v21, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0x19uLL</span>);
+        <span style="color:#f92672">*</span>(_QWORD <span style="color:#f92672">*</span>)digest <span style="color:#f92672">=</span> <span style="color:#ae81ff">0LL</span>;
+        v19 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0LL</span>;
+        s2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0LL</span>;
+        calc(v8, <span style="color:#ae81ff">4uLL</span>, digest);
+        <span style="color:#66d9ef">do</span>
+        {
+          v11 <span style="color:#f92672">=</span> magic[v10];
+          v12 <span style="color:#f92672">=</span> digest[v10];
+          v13 <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> v10<span style="color:#f92672">+</span><span style="color:#f92672">+</span>;
+          sprintf((<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>s2 <span style="color:#f92672">+</span> v13, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">%02x</span><span style="color:#e6db74">&#34;</span>, v11 <span style="color:#f92672">^</span> v12);
+        }
+        <span style="color:#66d9ef">while</span> ( v10 <span style="color:#f92672">!</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span> );
+        <span style="color:#66d9ef">if</span> ( memcmp(v9, <span style="color:#f92672">&amp;</span>s2, <span style="color:#ae81ff">0x20uLL</span>) )
+          <span style="color:#66d9ef">break</span>;
+        v8 <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>;
+        v9 <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0x21</span>;
+        <span style="color:#66d9ef">if</span> ( v8 <span style="color:#f92672">=</span><span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>user_input <span style="color:#f92672">+</span> <span style="color:#ae81ff">12</span> )
+        {
+          printk(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x011</span><span style="color:#e6db74">[BLUEPILL] You made the right choice! Now see the world for what it really is ..................... !</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+          v14 <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>init_task;
+          <span style="color:#66d9ef">while</span> ( <span style="color:#ae81ff">1</span> )
+          {
+            v15 <span style="color:#f92672">=</span> v14[<span style="color:#ae81ff">58</span>];
+            v14 <span style="color:#f92672">=</span> (_QWORD <span style="color:#f92672">*</span>)(v15 <span style="color:#f92672">-</span> <span style="color:#ae81ff">0x1D0</span>);
+            <span style="color:#66d9ef">if</span> ( (_UNKNOWN <span style="color:#f92672">*</span>)(v15 <span style="color:#f92672">-</span> <span style="color:#ae81ff">0x1D0</span>) <span style="color:#f92672">=</span><span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>init_task )
+              <span style="color:#66d9ef">break</span>;
+            <span style="color:#66d9ef">if</span> ( v15 <span style="color:#f92672">+</span> <span style="color:#ae81ff">192</span> <span style="color:#f92672">!</span><span style="color:#f92672">=</span> <span style="color:#f92672">*</span>(_QWORD <span style="color:#f92672">*</span>)(v15 <span style="color:#f92672">+</span> <span style="color:#ae81ff">192</span>) )
+            {
+              <span style="color:#66d9ef">for</span> ( i <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>(_QWORD <span style="color:#f92672">*</span><span style="color:#f92672">*</span>)(v15 <span style="color:#f92672">+</span> <span style="color:#ae81ff">192</span>); (_QWORD <span style="color:#f92672">*</span>)(v15 <span style="color:#f92672">+</span> <span style="color:#ae81ff">192</span>) <span style="color:#f92672">!</span><span style="color:#f92672">=</span> i; i <span style="color:#f92672">=</span> (_QWORD <span style="color:#f92672">*</span>)<span style="color:#f92672">*</span>i )
+              {
+                <span style="color:#66d9ef">if</span> ( <span style="color:#f92672">*</span>(_DWORD <span style="color:#f92672">*</span>)(i[<span style="color:#ae81ff">36</span>] <span style="color:#f92672">+</span> <span style="color:#ae81ff">4LL</span>) <span style="color:#f92672">=</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">1337</span> )
+                  i[<span style="color:#ae81ff">36</span>] <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>(_QWORD <span style="color:#f92672">*</span>)(v15 <span style="color:#f92672">+</span> <span style="color:#ae81ff">496</span>);
+              }
+            }
+          }
+          <span style="color:#66d9ef">return</span> v4;
+        }
+      }
+    }
+  }
+  printk(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x011</span><span style="color:#e6db74">[BLUEPILL] Morpheus sighs loudly .................................................................. </span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+  <span style="color:#66d9ef">return</span> v4;
+}
+</code></pre></div><p>Here, the first check to <code>user_input</code> is <code>if ( strlen(&amp;user_input) &gt; 0xB )</code>. So, take a note for that. Then, somehow it gets calculated <code>calc(v8, 4uLL, digest);</code>. What's this calc function does?</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">void</span> <span style="color:#66d9ef">__fastcall</span> <span style="color:#a6e22e">calc_md5</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int8</span> <span style="color:#f92672">*</span>initial_msg, size_t initial_len, <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int8</span> <span style="color:#f92672">*</span>digest)
+...
+  qmemcpy(msg, v3, initial_len);
+  msg[initial_len] <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">128</span>;
+  <span style="color:#66d9ef">while</span> ( i <span style="color:#f92672">&gt;</span> v6 )
+    msg[v6<span style="color:#f92672">+</span><span style="color:#f92672">+</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+  v8 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x98BADCFE</span>;
+  v9 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0xEFCDAB89</span>;
+  v10 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x67452301</span>;
+  to_bytes(<span style="color:#ae81ff">8</span> <span style="color:#f92672">*</span> initial_len, <span style="color:#f92672">&amp;</span>msg[i]);
+  to_bytes(v13 <span style="color:#f92672">&gt;</span><span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">29</span>, (v12 <span style="color:#f92672">+</span> v11 <span style="color:#f92672">+</span> <span style="color:#ae81ff">4</span>));
+  v15 <span style="color:#f92672">=</span> v14;
+...
+      <span style="color:#66d9ef">else</span>
+      {
+        v29 <span style="color:#f92672">=</span> v23 <span style="color:#f92672">^</span> v25 <span style="color:#f92672">&amp;</span> (v23 <span style="color:#f92672">^</span> v24);
+      }
+      v31 <span style="color:#f92672">=</span> v26 <span style="color:#f92672">+</span> w[v28] <span style="color:#f92672">+</span> k[v27] <span style="color:#f92672">+</span> v29;
+      v32 <span style="color:#f92672">=</span> r[v27<span style="color:#f92672">+</span><span style="color:#f92672">+</span>];
+      v33 <span style="color:#f92672">=</span> __ROL4__(v31, v32);
+      v26 <span style="color:#f92672">=</span> v23;
+      v34 <span style="color:#f92672">=</span> v25 <span style="color:#f92672">+</span> v33;
+      <span style="color:#66d9ef">if</span> ( v27 <span style="color:#f92672">=</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">64</span> )
+...
+</code></pre></div><p>The calc function is huge, some byte magic happen in place, so I'm guessing this is a hash function. A <strong>md5</strong> hash to be exact, because there are these constant <code>0x98BADCFE</code>, <code>0xEFCDAB89</code>, and <code>0x67452301</code>.</p>
+<p>Back to <code>pill_choice</code> function again, so we know that our <code>user_input</code> got calculated with md5. Next check happen at this part,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c">v5 <span style="color:#f92672">=</span> file_open(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">/proc/version</span><span style="color:#e6db74">&#34;</span>);
+...
+v9 <span style="color:#f92672">=</span> const_data;
+...
+file_read(v5, (<span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">__int8</span> <span style="color:#f92672">*</span>)magic, <span style="color:#ae81ff">0x1F4u</span>);
+...
+v10 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0LL</span>;
+...
+<span style="color:#66d9ef">do</span>
+{
+  v11 <span style="color:#f92672">=</span> magic[v10];
+  v12 <span style="color:#f92672">=</span> digest[v10];
+  v13 <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> v10<span style="color:#f92672">+</span><span style="color:#f92672">+</span>;
+  sprintf((<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>s2 <span style="color:#f92672">+</span> v13, <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">%02x</span><span style="color:#e6db74">&#34;</span>, v11 <span style="color:#f92672">^</span> v12);
+}
+<span style="color:#66d9ef">while</span> ( v10 <span style="color:#f92672">!</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span> );
+<span style="color:#66d9ef">if</span> ( memcmp(v9, <span style="color:#f92672">&amp;</span>s2, <span style="color:#ae81ff">0x20uLL</span>) )
+  <span style="color:#66d9ef">break</span>;
+v8 <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>;
+v9 <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0x21</span>;
+...
+</code></pre></div><p>Now, our <strong>hashed</strong> <code>user_input</code> got <em>xor</em>-ed with bytes from <code>/proc/version</code>, then compare it with constant at <code>.data</code> section.</p>
+<pre><code>.data:0000000000000800 const_md5       db '40369e8c78b46122a4e813228ae8ee6e',0
+.data:0000000000000821                 db 'e4a75afe114e4483a46aaa20fe4e6ead',0
+.data:0000000000000842                 db '8c3749214f4a9131ebc67e6c7a86d162',0
+</code></pre><p>Welp, thats all the checks. Lets sum it up</p>
+<ul>
+<li><code>strlen(user_input) &gt; 11</code></li>
+<li><code>md5(user_input[0:4]) ^ bytes(/proc/version) == '40369e8c78b46122a4e813228ae8ee6e'</code></li>
+<li><code>md5(user_input[4:8]) ^ bytes(/proc/version) == 'e4a75afe114e4483a46aaa20fe4e6ead'</code></li>
+<li><code>md5(user_input[8:12]) ^ bytes(/proc/version) == '8c3749214f4a9131ebc67e6c7a86d162'</code></li>
+</ul>
+<p>Oh, right, the content from <code>/proc/version</code> is <code>Linux version 4.17.0-rc4+ (likvidera@ubuntu) (gcc version 7.2.0 (Ubuntu 7.2.0-8ubuntu3.2)) #9 Sat May 12 12:57:01 PDT 2018</code></p>
+<hr>
+<p>Final solver script, this script just xor the constant from <code>.data</code> section with bytes from <code>/proc/version</code> which print the real md5 of our <code>user_input</code> then pass the real md5 to site like, hashkiller, etc.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-py" data-lang="py"><span style="color:#75715e">#!/usr/bin/env python</span>
+procver <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">Linux version 4.17.0-rc4+ (likvidera@ubuntu) (gcc version 7.2.0 (Ubuntu 7.2.0-8ubuntu3.2)) #9 Sat May 12 12:57:01 PDT 2018</span><span style="color:#e6db74">&#39;</span>
+
+const <span style="color:#f92672">=</span> [
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">40369e8c78b46122a4e813228ae8ee6e</span><span style="color:#e6db74">&#39;</span>,
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">e4a75afe114e4483a46aaa20fe4e6ead</span><span style="color:#e6db74">&#39;</span>,
+    <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">8c3749214f4a9131ebc67e6c7a86d162</span><span style="color:#e6db74">&#39;</span>
+]
+
+new_const <span style="color:#f92672">=</span> []
+<span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> const:
+    new_const<span style="color:#f92672">.</span>append(map(<span style="color:#66d9ef">lambda</span> x: int(x, <span style="color:#ae81ff">16</span>), [c[i:i<span style="color:#f92672">+</span><span style="color:#ae81ff">2</span>] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(c), <span style="color:#ae81ff">2</span>)]))
+
+<span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> new_const:
+    raw <span style="color:#f92672">=</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">&#39;</span>
+    i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">for</span> k <span style="color:#f92672">in</span> c:
+        raw <span style="color:#f92672">+</span><span style="color:#f92672">=</span> hex(ord(procver[i]) <span style="color:#f92672">^</span> k)[<span style="color:#ae81ff">2</span>:]<span style="color:#f92672">.</span>rjust(<span style="color:#ae81ff">2</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">0</span><span style="color:#e6db74">&#39;</span>)
+        i <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+    <span style="color:#66d9ef">print</span> raw
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">$ python solve.py
+0c5ff0f900941747d69b7a4de4c8da40
+a8ce348b696e32e6d619c34f906e5a83
+c05e2754376ae75499b5170314a6e54c
+</code></pre></div><p>&hellip; From <a href="https://hashkiller.co.uk">https://hashkiller.co.uk</a>,</p>
+<pre><code>0c5ff0f900941747d69b7a4de4c8da40 MD5 : g1Mm
+a8ce348b696e32e6d619c34f906e5a83 MD5 : 3Th3
+c05e2754376ae75499b5170314a6e54c MD5 : r3D1
+</code></pre><p>Final <code>user_input</code> string, <code>giMm3Th3r3D1</code>. Welp, too bad the service is down after CTF ends. But this is the answer tho, solved while CTF still running. Anyway, to get the flag, you just need to write the final <code>user_input</code> to <code>/proc/bluepill</code> for example,</p>
+<pre><code>echo -ne 'giMm3Th3r3D1' &gt; /proc/bluepill
+</code></pre><p>Then, you will get an escalated permission to read the flag file.</p>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://zeroload.github.io/posts/security-fest-ctf-2018-sshnuke/"><i class="fa fa-chevron-circle-left"></i> Security Fest CTF 2018 - sshnuke</a>
+        </li>
+        
+        
+        <li>
+            <a href="http://zeroload.github.io/posts/ctfzone-2018-quals-android-ololo-country-checker/">CTFZone 2018 Quals - android_ololo_country_checker <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - kiror0 |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://zeroload.github.io/index.xml">Subscribe</a></h6>
+    </footer>
+</div>
+<script src="http://zeroload.github.io/js/scripts.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146594173-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,201 @@
+<!doctype html>
+
+<html lang="en-us">
+
+<head>
+  <title>Catousify</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The HTML5 Herald" />
+  <meta name="author" content="kiror0" /><meta name="generator" content="Hugo 0.62.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css" />
+  <script src="https://kit.fontawesome.com/b76b73e8e8.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="http://zeroload.github.io/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="http://zeroload.github.io/">Catousify</a>
+            </h1>
+
+      <ul id="social-media">
+        
+        
+          
+        <li><a href="https://github.com/kiror0"><i class="fab fa-github fa-lg" aria-hidden="true"></i></a></li>
+           
+      </ul>
+      
+      <p><em>No Clever Tagline Needed.</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Posts</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="http://zeroload.github.io/about/">
+                <i class="fa-li fa  fa-lg"></i><span>About Me</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>HackToday 2018 - Kompeni Pemberantas Korupsi</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2018-08-05T17:52:20Z">Aug 5, 2018</time>
+        </li>
+        
+        <li>
+            Categories:
+            <em>
+                
+                    
+                    <a href="http://zeroload.github.io/categories/rev">rev</a>
+                
+                    , 
+                    <a href="http://zeroload.github.io/categories/writeup">writeup</a>
+                
+            </em>
+        </li>
+        
+
+        
+
+        <li>2 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <blockquote>
+<p>Downloads:</p>
+<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/kpk">kpk</a></p>
+<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/draw_chess.py">draw_chess.py</a></p>
+<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/chess.png">chess.png</a></p>
+<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/chess.png.kpk">chess.png.kpk</a></p>
+<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/flag.png.kpk">flag.png.kpk</a></p>
+<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/flag_recovered.png">flag_recovered.png</a></p>
+<p><a href="http://zeroload.github.io/assets/hacktoday/kpk/solver.py">solver.py</a></p>
+</blockquote>
+<p>Ada beberapa cara yang dapat dilakukan untuk solve problem seperti ini, yang agak lebih mudah yaitu melakukan blackbox dengan fuzzing file input dan check file output yang dihasilkan. Berikut contoh script untuk menghasilkan file input (PNG),</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
+
+width, height <span style="color:#f92672">=</span> (<span style="color:#ae81ff">200</span>, <span style="color:#ae81ff">200</span>)
+
+pixels <span style="color:#f92672">=</span> [(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(width <span style="color:#f92672">*</span> height)]
+
+img <span style="color:#f92672">=</span> Image<span style="color:#f92672">.</span>new(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">RGB</span><span style="color:#e6db74">&#39;</span>, (width, height))
+img<span style="color:#f92672">.</span>putdata(pixels)
+img<span style="color:#f92672">.</span>save(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">input.png</span><span style="color:#e6db74">&#39;</span>)
+</code></pre></div><p>Perlu dilakukan beberapa validasi bagaimana binary memproses data PNG, untuk itu dapat dilakukan pengubahan pola warna input menjadi chess tiles atau yang lain.</p>
+<pre><code>... warna hitam
+00000000  7f 4b 50 4b c8 00 00 00  c8 00 00 00 ff 00 00 00
+00000010  ff 00 00 00 ff 00 00 00  ff 00 00 00 ff 00 00 00
+... warna putih
+00000000  7f 4b 50 4b c8 00 00 00  c8 00 00 00 ff ff ff ff
+00000010  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff
+... 253 more
+</code></pre><p>Dari hasil tersebut, dapat disimpulkan <code>7f4b504b</code> <code>\x7FKPK</code> adalah file signature dan <code>c8...</code> <code>c8...</code> adalah size <code>(width * height)</code> dari file PNG (0xc8 == 200). Untuk warna dari file PNG, dapat diasumsikan ter-encode dalam <strong>RLE</strong> (info didapat dari hint) tanpa ada pengubahan dalam proses membaca data pixel dari gambar (linear read). Dengan begitu, langkah terakhir hanya dibutuhkan script untuk inflate file menjadi raw pixels dan simpan dalam bentuk gambar berukuran (width, height). <a href="http://zeroload.github.io/assets/hacktoday/kpk/solver.py">Full solver</a>,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
+<span style="color:#f92672">from</span> struct <span style="color:#f92672">import</span> unpack
+
+u32 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x : unpack(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">&lt;I</span><span style="color:#e6db74">&#34;</span>, x)[<span style="color:#ae81ff">0</span>]
+u8 <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x : unpack(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">&lt;B</span><span style="color:#e6db74">&#34;</span>, x)[<span style="color:#ae81ff">0</span>]
+uRGB <span style="color:#f92672">=</span> <span style="color:#66d9ef">lambda</span> x : unpack(<span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">&lt;BBB</span><span style="color:#e6db74">&#34;</span>, x)
+
+<span style="color:#66d9ef">with</span> open(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">flag.png.kpk</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">rb</span><span style="color:#e6db74">&#39;</span>) <span style="color:#66d9ef">as</span> f:
+    data <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>read()
+    length <span style="color:#f92672">=</span> len(data)
+
+<span style="color:#66d9ef">assert</span>(data[<span style="color:#ae81ff">0</span>:<span style="color:#ae81ff">4</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74"></span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x7F</span><span style="color:#e6db74">KPK</span><span style="color:#e6db74">&#34;</span>)
+
+width <span style="color:#f92672">=</span> u32(data[<span style="color:#ae81ff">4</span>:<span style="color:#ae81ff">8</span>])
+height <span style="color:#f92672">=</span> u32(data[<span style="color:#ae81ff">8</span>:<span style="color:#ae81ff">12</span>])
+
+pos <span style="color:#f92672">=</span> <span style="color:#ae81ff">12</span>
+
+pixels <span style="color:#f92672">=</span> []
+
+<span style="color:#66d9ef">while</span> len(pixels) <span style="color:#f92672">&lt;</span> width <span style="color:#f92672">*</span> height:
+    rl <span style="color:#f92672">=</span> u8(data[pos:pos<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>])
+    <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(rl):
+        pixels<span style="color:#f92672">.</span>append(uRGB(data[pos<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>:pos<span style="color:#f92672">+</span><span style="color:#ae81ff">4</span>]))
+    pos <span style="color:#f92672">+</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>
+
+img <span style="color:#f92672">=</span> Image<span style="color:#f92672">.</span>new(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">RGB</span><span style="color:#e6db74">&#39;</span>, (width, height))
+img<span style="color:#f92672">.</span>putdata(pixels)
+img<span style="color:#f92672">.</span>save(<span style="color:#e6db74"></span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">flag_recovered.png</span><span style="color:#e6db74">&#39;</span>)
+</code></pre></div><p>Hasilnya,
+<img src="http://zeroload.github.io/assets/hacktoday/kpk/flag_recovered.png" alt="flag.png"></p>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="http://zeroload.github.io/posts/post-event-hacktoday-2018-quals/"><i class="fa fa-chevron-circle-left"></i> Post Event HackToday 2018 Quals</a>
+        </li>
+        
+        
+        <li>
+            <a href="http://zeroload.github.io/posts/hacktoday-2018-faile/">HackToday 2018 - faile <i class="fa fa-chevron-circle-right"></i> </a>
+        </li>
+        
+    </ul>
+</section>
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - kiror0 |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="http://zeroload.github.io/index.xml">Subscribe</a></h6>
+    </footer>
+</div>
+<script src="http://zeroload.github.io/js/scripts.js"></script>
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146594173-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

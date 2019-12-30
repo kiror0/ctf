@@ -1,4 +1,4 @@
-baseURL = "http://zeroload.github.io/"
+baseURL = "http://zeroload.github.io/ctf/"
 publishDir = "ctf"
 languageCode = "en-us"
 title = "Catousify"
