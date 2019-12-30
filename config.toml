@@ -1,4 +1,4 @@
-baseURL = "http://kiror0.github.io/ctf/"
+baseURL = "https://kiror0.github.io/ctf/"
 languageCode = "en-us"
 title = "Catousify"
 canonifyurls = true
